@@ -1,0 +1,353 @@
+{% comment %}
+  Product template — media, content, and add-to-cart form.
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+{% endcomment %}
+
+<section class="product-page" style="--product-accent: {{ section.settings.accent_color }};">
+  <div class="product-page__inner">
+
+    {%- comment -%} Left: Product images {%- endcomment -%}
+    <div class="product-images">
+      {% for image in product.images %}
+        <div class="product-image">
+          {% render 'image', class: 'product-image__img', image: image %}
+        </div>
+      {% else %}
+        <div class="product-image product-image--placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'product-image__img' }}
+        </div>
+      {% endfor %}
+    </div>
+
+    {%- comment -%} Right: Info + form {%- endcomment -%}
+    <div class="product-page__details">
+
+      <div class="product-info">
+        {%- if product.vendor != blank -%}
+          <p class="product-info__vendor">{{ product.vendor }}</p>
+        {%- endif -%}
+
+        <h1 class="product-info__title">{{ product.title }}</h1>
+
+        <p class="product-info__price">{{ product.price | money }}</p>
+
+        <div class="product-info__description rte">
+          {{ product.description }}
+        </div>
+      </div>
+
+      <div class="product-form">
+        {% form 'product', product %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+
+          {%- if product.variants.size > 1 -%}
+            <div class="product-form__field">
+              <label class="product-form__label" for="product-variant">Variant</label>
+              <div class="product-form__select-wrap">
+                <select name="id" id="product-variant" class="product-form__select">
+                  {% for variant in product.variants %}
+                    <option
+                      value="{{ variant.id }}"
+                      {% if variant == current_variant %}selected="selected"{% endif %}
+                    >
+                      {{ variant.title }} - {{ variant.price | money }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <svg class="product-form__select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+                  <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          {%- else -%}
+            <select name="id" hidden>
+              <option value="{{ current_variant.id }}" selected="selected">{{ current_variant.title }}</option>
+            </select>
+          {%- endif -%}
+
+          <div class="product-form__field">
+            <label class="product-form__label" for="product-quantity">Quantity</label>
+            <input
+              type="number"
+              name="quantity"
+              id="product-quantity"
+              class="product-form__qty"
+              min="1"
+              value="1"
+            >
+          </div>
+
+          <div class="product-form__buttons">
+            <button type="submit" class="product-form__submit">Add to cart</button>
+            {{ form | payment_button }}
+          </div>
+        {% endform %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* ── Section shell ──────────────────────────────────── */
+  .product-page {
+    padding: 4rem 0;
+    background: var(--color-background);
+  }
+
+  .product-page__inner {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+
+  /* ── Product images ─────────────────────────────────── */
+  .product-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* First image spans full width */
+  .product-image:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .product-image {
+    border-radius: 16px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--product-accent, #c49a5e) 7%, transparent);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s ease;
+  }
+
+  .product-image:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.16);
+  }
+
+  .product-image__img,
+  .product-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .product-image:hover .product-image__img,
+  .product-image:hover img {
+    transform: scale(1.05);
+  }
+
+  .product-image--placeholder {
+    opacity: 0.3;
+  }
+
+  /* ── Product details ────────────────────────────────── */
+  .product-page__details {
+    position: sticky;
+    top: 90px;
+  }
+
+  .product-info__vendor {
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--product-accent, #c49a5e);
+    margin: 0 0 0.75rem;
+  }
+
+  .product-info__title {
+    font-family: var(--font-primary--family);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground);
+    margin: 0 0 0.875rem;
+  }
+
+  .product-info__price {
+    font-family: var(--font-primary--family);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--product-accent, #c49a5e);
+    margin: 0 0 1.5rem;
+  }
+
+  .product-info__description {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-foreground);
+    opacity: 0.7;
+    margin: 0 0 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .product-info__description p {
+    margin: 0 0 0.75rem;
+  }
+
+  /* ── Form ───────────────────────────────────────────── */
+  .product-form__field {
+    margin-bottom: 1.25rem;
+  }
+
+  .product-form__label {
+    display: block;
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.6;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Variant select */
+  .product-form__select-wrap {
+    position: relative;
+  }
+
+  .product-form__select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    padding: 0.85rem 2.75rem 0.85rem 1rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.9375rem;
+    color: var(--color-foreground);
+    background: var(--color-background);
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .product-form__select:focus {
+    outline: none;
+    border-color: var(--product-accent, #c49a5e);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--product-accent, #c49a5e) 14%, transparent);
+  }
+
+  .product-form__select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-foreground);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Quantity input */
+  .product-form__qty {
+    width: 110px;
+    padding: 0.85rem 1rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.9375rem;
+    color: var(--color-foreground);
+    background: var(--color-background);
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    border-radius: 10px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .product-form__qty:focus {
+    outline: none;
+    border-color: var(--product-accent, #c49a5e);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--product-accent, #c49a5e) 14%, transparent);
+  }
+
+  /* Buttons */
+  .product-form__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .product-form__submit {
+    width: 100%;
+    padding: 1.05rem 1.5rem;
+    background: var(--product-accent, #c49a5e);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+  }
+
+  .product-form__submit:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.07);
+    box-shadow: 0 14px 28px color-mix(in srgb, var(--product-accent, #c49a5e) 45%, transparent);
+  }
+
+  .product-form__submit:active {
+    transform: translateY(-1px);
+  }
+
+  /* Shopify dynamic payment button */
+  .product-form__buttons .shopify-payment-button {
+    width: 100%;
+  }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 899px) {
+    .product-page {
+      padding: 2.5rem 0;
+    }
+
+    .product-page__inner {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .product-page__details {
+      position: static;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .product-images {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.product",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.colors"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "t:labels.accent_color",
+      "default": "#c49a5e"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

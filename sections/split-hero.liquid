@@ -1,0 +1,547 @@
+<section
+  class="split-hero"
+  style="--split-accent: {{ section.settings.accent_color }};"
+>
+  <div class="split-hero__inner{% if section.settings.image_position == 'left' %} split-hero__inner--flip{% endif %}">
+
+    {%- comment -%} Left: Text content {%- endcomment -%}
+    <div class="split-hero__content">
+
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="split-hero__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h2 class="split-hero__heading">{{ section.settings.heading | newline_to_br }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.description != blank -%}
+        <p class="split-hero__description">{{ section.settings.description }}</p>
+      {%- endif -%}
+
+      <div class="split-hero__bottom">
+
+        {%- if section.settings.cta_label != blank -%}
+          <a
+            href="{{ section.settings.cta_url | default: '#' }}"
+            class="split-hero__cta"
+          >
+            <span>{{ section.settings.cta_label }}</span>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 12L12 2M12 2H4M12 2v8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        {%- endif -%}
+
+        {%- comment -%} Social proof: avatars + stat lines {%- endcomment -%}
+        {%- liquid
+          assign has_avatars = false
+          if section.settings.avatar_1 != blank
+            assign has_avatars = true
+          endif
+          if section.settings.avatar_2 != blank
+            assign has_avatars = true
+          endif
+          if section.settings.avatar_3 != blank
+            assign has_avatars = true
+          endif
+          if section.settings.avatar_4 != blank
+            assign has_avatars = true
+          endif
+          if section.settings.avatar_5 != blank
+            assign has_avatars = true
+          endif
+        -%}
+
+        {%- if has_avatars or section.settings.stat_1 != blank or section.settings.stat_2 != blank -%}
+          <div class="split-hero__proof">
+
+            {%- if has_avatars -%}
+              <div class="split-hero__avatars" aria-hidden="true">
+                {%- if section.settings.avatar_1 != blank -%}
+                  <div class="split-hero__avatar">
+                    {{- section.settings.avatar_1
+                      | image_url: width: 80, format: 'webp'
+                      | image_tag: class: 'split-hero__avatar-img', alt: '', width: 40, height: 40, loading: 'lazy'
+                    -}}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.avatar_2 != blank -%}
+                  <div class="split-hero__avatar">
+                    {{- section.settings.avatar_2
+                      | image_url: width: 80, format: 'webp'
+                      | image_tag: class: 'split-hero__avatar-img', alt: '', width: 40, height: 40, loading: 'lazy'
+                    -}}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.avatar_3 != blank -%}
+                  <div class="split-hero__avatar">
+                    {{- section.settings.avatar_3
+                      | image_url: width: 80, format: 'webp'
+                      | image_tag: class: 'split-hero__avatar-img', alt: '', width: 40, height: 40, loading: 'lazy'
+                    -}}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.avatar_4 != blank -%}
+                  <div class="split-hero__avatar">
+                    {{- section.settings.avatar_4
+                      | image_url: width: 80, format: 'webp'
+                      | image_tag: class: 'split-hero__avatar-img', alt: '', width: 40, height: 40, loading: 'lazy'
+                    -}}
+                  </div>
+                {%- endif -%}
+                {%- if section.settings.avatar_5 != blank -%}
+                  <div class="split-hero__avatar">
+                    {{- section.settings.avatar_5
+                      | image_url: width: 80, format: 'webp'
+                      | image_tag: class: 'split-hero__avatar-img', alt: '', width: 40, height: 40, loading: 'lazy'
+                    -}}
+                  </div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+
+            <div class="split-hero__stats">
+              {%- if section.settings.stat_1 != blank -%}
+                <p class="split-hero__stat">{{ section.settings.stat_1 }}</p>
+              {%- endif -%}
+              {%- if section.settings.stat_2 != blank -%}
+                <p class="split-hero__stat">
+                  {{- section.settings.stat_2 -}}
+                  {%- if section.settings.stat_2_highlight != blank -%}
+                    <span class="split-hero__stat-accent"> {{ section.settings.stat_2_highlight }}</span>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+            </div>
+
+          </div>
+        {%- endif -%}
+
+      </div>
+    </div>
+
+    {%- comment -%} Right: Product image {%- endcomment -%}
+    <div class="split-hero__media">
+      {%- if section.settings.image != blank -%}
+        {{- section.settings.image
+          | image_url: width: 900, format: 'webp'
+          | image_tag:
+            class: 'split-hero__image',
+            alt: shop.name,
+            loading: 'eager'
+        -}}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'split-hero__placeholder' }}
+      {%- endif -%}
+    </div>
+
+  </div>
+</section>
+
+{% stylesheet %}
+  /* ── Section shell ──────────────────────────────────── */
+  .split-hero {
+    padding: 5rem 0;
+    background: var(--color-background);
+    overflow: hidden;
+  }
+
+  .split-hero__inner {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+    display: flex;
+    align-items: center;
+    gap: 4.5rem;
+  }
+
+  .split-hero__inner--flip {
+    flex-direction: row-reverse;
+  }
+
+  /* ── Content side ───────────────────────────────────── */
+  .split-hero__content {
+    flex: 1;
+    min-width: 0;
+    animation: split-hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .split-hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--split-accent, #c49a5e);
+    margin: 0 0 1.125rem;
+  }
+
+  /* Small accent line before the eyebrow */
+  .split-hero__eyebrow::before {
+    content: '';
+    width: 28px;
+    height: 2px;
+    background: var(--split-accent, #c49a5e);
+    border-radius: 2px;
+  }
+
+  .split-hero__heading {
+    font-family: var(--font-primary--family);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-foreground);
+    margin: 0 0 1.5rem;
+  }
+
+  .split-hero__description {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-foreground);
+    opacity: 0.62;
+    margin: 0 0 2.5rem;
+    max-width: 48ch;
+  }
+
+  /* ── Bottom row ─────────────────────────────────────── */
+  .split-hero__bottom {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── CTA button (pill + accent fill on hover) ───────── */
+  .split-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 1rem 1.875rem;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    border-radius: 999px;
+    font-family: var(--font-primary--family);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.25s ease, color 0.25s ease,
+                transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .split-hero__cta:hover {
+    background: var(--split-accent, #c49a5e);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px
+      color-mix(in srgb, var(--split-accent, #c49a5e) 45%, transparent);
+  }
+
+  .split-hero__cta svg {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .split-hero__cta:hover svg {
+    transform: translate(3px, -3px);
+  }
+
+  /* ── Social proof ───────────────────────────────────── */
+  .split-hero__proof {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .split-hero__avatars {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .split-hero__avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2.5px solid var(--color-background);
+    flex-shrink: 0;
+    margin-left: -12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s ease;
+  }
+
+  .split-hero__avatar:first-child {
+    margin-left: 0;
+  }
+
+  /* Avatar lifts on hover */
+  .split-hero__avatar:hover {
+    transform: translateY(-4px) scale(1.08);
+    z-index: 2;
+  }
+
+  .split-hero__avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .split-hero__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .split-hero__stat {
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    margin: 0;
+    opacity: 0.75;
+  }
+
+  .split-hero__stat-accent {
+    color: var(--split-accent, #c49a5e);
+    opacity: 1;
+  }
+
+  /* ── Image side (rounded card + offset accent frame) ── */
+  .split-hero__media {
+    position: relative;
+    flex: 0 0 48%;
+    max-width: 48%;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow:
+      24px 24px 0 -4px color-mix(in srgb, var(--split-accent, #c49a5e) 28%, transparent),
+      0 26px 55px rgba(0, 0, 0, 0.14);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.5s ease;
+    animation: split-hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+
+  .split-hero__media:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      16px 16px 0 -4px color-mix(in srgb, var(--split-accent, #c49a5e) 38%, transparent),
+      0 34px 65px rgba(0, 0, 0, 0.2);
+  }
+
+  .split-hero__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Zoom on hover (clipped by the rounded card) */
+  .split-hero__media:hover .split-hero__image {
+    transform: scale(1.06);
+  }
+
+  .split-hero__placeholder {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0.2;
+  }
+
+  /* ── Entrance animation ─────────────────────────────── */
+  @keyframes split-hero-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .split-hero__inner {
+      gap: 2.5rem;
+    }
+
+    .split-hero__heading {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .split-hero {
+      padding: 3rem 0 2.5rem;
+    }
+
+    .split-hero__inner,
+    .split-hero__inner--flip {
+      flex-direction: column-reverse;
+      gap: 2.25rem;
+    }
+
+    .split-hero__content,
+    .split-hero__media {
+      flex: none;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    /* Smaller accent frame offset on mobile */
+    .split-hero__media {
+      box-shadow:
+        14px 14px 0 -4px color-mix(in srgb, var(--split-accent, #c49a5e) 28%, transparent),
+        0 18px 40px rgba(0, 0, 0, 0.14);
+    }
+
+    .split-hero__description {
+      max-width: none;
+    }
+
+    .split-hero__bottom {
+      gap: 1.25rem;
+    }
+
+    .split-hero__proof {
+      gap: 0.625rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .split-hero__content,
+    .split-hero__media {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.split_hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "Why choose us"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Beyond Furniture\nCreating A Lifestyle"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:labels.description",
+      "default": "With thousands of satisfied customers, we are a trusted name in quality furniture. Our thoughtfully designed pieces bring comfort, style, and functionality to every home. Experience the difference today!"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "t:labels.cta_label",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "t:labels.cta_url"
+    },
+    {
+      "type": "header",
+      "content": "t:general.social_proof"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_1",
+      "label": "t:labels.avatar_1"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_2",
+      "label": "t:labels.avatar_2"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_3",
+      "label": "t:labels.avatar_3"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_4",
+      "label": "t:labels.avatar_4"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_5",
+      "label": "t:labels.avatar_5"
+    },
+    {
+      "type": "text",
+      "id": "stat_1",
+      "label": "t:labels.stat_1",
+      "default": "Trusted by thousands"
+    },
+    {
+      "type": "text",
+      "id": "stat_2",
+      "label": "t:labels.stat_2",
+      "default": "Loved by"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_highlight",
+      "label": "t:labels.stat_2_highlight",
+      "default": "Homes"
+    },
+    {
+      "type": "header",
+      "content": "t:general.image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "t:labels.image_position",
+      "options": [
+        { "value": "right", "label": "t:options.alignment.right" },
+        { "value": "left", "label": "t:options.alignment.left" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "header",
+      "content": "t:general.colors"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "t:labels.accent_color",
+      "default": "#c49a5e"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.split_hero"
+    }
+  ]
+}
+{% endschema %}

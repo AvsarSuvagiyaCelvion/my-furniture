@@ -1,0 +1,116 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "hello-world",
+      "disabled": true,
+      "settings": {}
+    },
+    "split_hero_NCdKnk": {
+      "type": "split-hero",
+      "name": "t:general.split_hero",
+      "settings": {
+        "eyebrow": "Why choose us",
+        "heading": "Beyond Furniture\nCreating A Lifestyle",
+        "description": "With thousands of satisfied customers, we are a trusted name in quality furniture. Our thoughtfully designed pieces bring comfort, style, and functionality to every home. Experience the difference today!",
+        "cta_label": "Learn more",
+        "cta_url": "",
+        "stat_1": "Trusted by thousands",
+        "stat_2": "Loved by",
+        "stat_2_highlight": "Homes",
+        "image": "shopify://shop_images/hero_image.webp",
+        "image_position": "right",
+        "accent_color": "#c49a5e"
+      }
+    },
+    "collections_showcase_tNVQ6d": {
+      "type": "collections-showcase",
+      "name": "t:general.collections_showcase",
+      "settings": {
+        "heading": "Designed for Every Space",
+        "subheading": "Whether it's your living room or workspace, we have the perfect piece for you.",
+        "collection_1": "home-collection",
+        "collection_1_label": "Home Collection",
+        "collection_1_cta": "Shop now",
+        "collection_2": "office-collection",
+        "collection_2_label": "Office Collection",
+        "collection_2_image": "shopify://shop_images/office_table.webp",
+        "collection_2_cta": "Shop now"
+      }
+    },
+    "why_choose_us_RYVPmx": {
+      "type": "why-choose-us",
+      "blocks": {
+        "feature_HAwDie": {
+          "type": "feature",
+          "settings": {
+            "icon": "diamond",
+            "title": "Premium Quality",
+            "description": "Crafted from the finest materials for lasting beauty."
+          }
+        },
+        "feature_TkbYVy": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Free Delivery",
+            "description": "Free shipping on all orders, right to your door."
+          }
+        },
+        "feature_xhabkj": {
+          "type": "feature",
+          "settings": {
+            "icon": "refresh",
+            "title": "Easy Returns",
+            "description": "30-day hassle-free return policy, no questions asked."
+          }
+        },
+        "feature_QzCX6r": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Secure Payment",
+            "description": "Your payment information is always protected."
+          }
+        },
+        "feature_iY6dJP": {
+          "type": "feature",
+          "settings": {
+            "icon": "sparkle",
+            "title": "Modern Designs",
+            "description": "Contemporary styles that elevate any space."
+          }
+        }
+      },
+      "block_order": [
+        "feature_HAwDie",
+        "feature_TkbYVy",
+        "feature_xhabkj",
+        "feature_QzCX6r",
+        "feature_iY6dJP"
+      ],
+      "name": "t:general.why_choose_us",
+      "settings": {
+        "heading": "Why Choose Us",
+        "subheading": "",
+        "icon_style": "circle",
+        "icon_color": "#c49a5e",
+        "section_background": "warm"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "split_hero_NCdKnk",
+    "collections_showcase_tNVQ6d",
+    "why_choose_us_RYVPmx"
+  ]
+}

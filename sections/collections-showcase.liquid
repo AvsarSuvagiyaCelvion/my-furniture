@@ -1,0 +1,400 @@
+<section class="cshowcase">
+  <div class="cshowcase__inner">
+
+    {%- comment -%} Section header {%- endcomment -%}
+    <div class="cshowcase__header">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="cshowcase__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="cshowcase__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Cards grid {%- endcomment -%}
+    <div class="cshowcase__grid">
+
+      {%- comment -%} Card 1 {%- endcomment -%}
+      {%- liquid
+        if section.settings.collection_1_image != blank
+          assign c1_img = section.settings.collection_1_image
+        elsif section.settings.collection_1 != blank and section.settings.collection_1.featured_image != blank
+          assign c1_img = section.settings.collection_1.featured_image
+        else
+          assign c1_img = nil
+        endif
+
+        if section.settings.collection_1 != blank
+          assign c1_url = section.settings.collection_1.url
+          assign c1_title = section.settings.collection_1.title
+        else
+          assign c1_url = routes.collections_url
+          assign c1_title = 'Home Collection'
+        endif
+
+        if section.settings.collection_1_label != blank
+          assign c1_title = section.settings.collection_1_label
+        endif
+
+        assign c1_cta = section.settings.collection_1_cta
+        if c1_cta == blank
+          assign c1_cta = 'Shop now'
+        endif
+      -%}
+
+      <a href="{{ c1_url }}" class="cshowcase__card">
+        <div class="cshowcase__card-media">
+          {%- if c1_img != nil -%}
+            {{- c1_img
+              | image_url: width: 900, format: 'webp'
+              | image_tag:
+                class: 'cshowcase__card-img',
+                alt: c1_title,
+                loading: 'lazy'
+            -}}
+          {%- else -%}
+            {{ 'collection-1' | placeholder_svg_tag: 'cshowcase__card-placeholder' }}
+          {%- endif -%}
+        </div>
+        <div class="cshowcase__card-overlay">
+          <div class="cshowcase__card-body">
+            <p class="cshowcase__card-label">{{ c1_title }}</p>
+            <span class="cshowcase__card-cta">
+              {{ c1_cta }}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      {%- comment -%} Card 2 {%- endcomment -%}
+      {%- liquid
+        if section.settings.collection_2_image != blank
+          assign c2_img = section.settings.collection_2_image
+        elsif section.settings.collection_2 != blank and section.settings.collection_2.featured_image != blank
+          assign c2_img = section.settings.collection_2.featured_image
+        else
+          assign c2_img = nil
+        endif
+
+        if section.settings.collection_2 != blank
+          assign c2_url = section.settings.collection_2.url
+          assign c2_title = section.settings.collection_2.title
+        else
+          assign c2_url = routes.collections_url
+          assign c2_title = 'Office Collection'
+        endif
+
+        if section.settings.collection_2_label != blank
+          assign c2_title = section.settings.collection_2_label
+        endif
+
+        assign c2_cta = section.settings.collection_2_cta
+        if c2_cta == blank
+          assign c2_cta = 'Shop now'
+        endif
+      -%}
+
+      <a href="{{ c2_url }}" class="cshowcase__card">
+        <div class="cshowcase__card-media">
+          {%- if c2_img != nil -%}
+            {{- c2_img
+              | image_url: width: 900, format: 'webp'
+              | image_tag:
+                class: 'cshowcase__card-img',
+                alt: c2_title,
+                loading: 'lazy'
+            -}}
+          {%- else -%}
+            {{ 'collection-2' | placeholder_svg_tag: 'cshowcase__card-placeholder' }}
+          {%- endif -%}
+        </div>
+        <div class="cshowcase__card-overlay">
+          <div class="cshowcase__card-body">
+            <p class="cshowcase__card-label">{{ c2_title }}</p>
+            <span class="cshowcase__card-cta">
+              {{ c2_cta }}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* ── Section shell ──────────────────────────────────── */
+  .cshowcase {
+    padding: 5rem 0;
+    background: var(--color-background);
+  }
+
+  .cshowcase__inner {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+  }
+
+  /* ── Header ─────────────────────────────────────────── */
+  .cshowcase__header {
+    text-align: center;
+    margin-bottom: 2.75rem;
+  }
+
+  .cshowcase__heading {
+    font-family: var(--font-primary--family);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--color-foreground);
+    margin: 0 0 0.875rem;
+  }
+
+  .cshowcase__subheading {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-foreground);
+    opacity: 0.58;
+    margin: 0 auto;
+    max-width: 52ch;
+  }
+
+  /* ── Cards grid ─────────────────────────────────────── */
+  .cshowcase__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  /* ── Individual card ────────────────────────────────── */
+  .cshowcase__card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 10px;
+    text-decoration: none;
+    background: #e8e4df;
+    min-height: 500px;
+  }
+
+  /* Image */
+  .cshowcase__card-media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .cshowcase__card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .cshowcase__card:hover .cshowcase__card-img {
+    transform: scale(1.05);
+  }
+
+  .cshowcase__card-placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0.25;
+  }
+
+  /* Gradient overlay */
+  .cshowcase__card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.28) 45%,
+      rgba(0, 0, 0, 0.04) 75%,
+      transparent 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    transition: background 0.3s ease;
+  }
+
+  .cshowcase__card:hover .cshowcase__card-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.80) 0%,
+      rgba(0, 0, 0, 0.35) 50%,
+      rgba(0, 0, 0, 0.08) 80%,
+      transparent 100%
+    );
+  }
+
+  /* Text content inside card */
+  .cshowcase__card-body {
+    padding: 2.25rem 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cshowcase__card-label {
+    font-family: var(--font-primary--family);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  /* CTA row */
+  .cshowcase__card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+    transition: color 0.2s ease, gap 0.25s ease;
+  }
+
+  .cshowcase__card:hover .cshowcase__card-cta {
+    color: #ffffff;
+    gap: 0.625rem;
+  }
+
+  .cshowcase__card-cta svg {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  .cshowcase__card:hover .cshowcase__card-cta svg {
+    transform: translateX(3px);
+  }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .cshowcase {
+      padding: 3.5rem 0;
+    }
+
+    .cshowcase__grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .cshowcase__card {
+      min-height: 360px;
+    }
+
+    .cshowcase__card-body {
+      padding: 1.5rem 1.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cshowcase__card {
+      min-height: 300px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.collections_showcase",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Designed for Every Space"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Whether it's your living room or workspace, we have the perfect piece for you."
+    },
+    {
+      "type": "header",
+      "content": "t:labels.collection_1"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "t:labels.collection_1"
+    },
+    {
+      "type": "text",
+      "id": "collection_1_label",
+      "label": "t:labels.collection_1_label",
+      "placeholder": "Home Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_1_image",
+      "label": "t:labels.collection_1_image"
+    },
+    {
+      "type": "text",
+      "id": "collection_1_cta",
+      "label": "t:labels.collection_1_cta",
+      "default": "Shop now"
+    },
+    {
+      "type": "header",
+      "content": "t:labels.collection_2"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "t:labels.collection_2"
+    },
+    {
+      "type": "text",
+      "id": "collection_2_label",
+      "label": "t:labels.collection_2_label",
+      "placeholder": "Office Collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "collection_2_image",
+      "label": "t:labels.collection_2_image"
+    },
+    {
+      "type": "text",
+      "id": "collection_2_cta",
+      "label": "t:labels.collection_2_cta",
+      "default": "Shop now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.collections_showcase",
+      "settings": {
+        "heading": "Designed for Every Space",
+        "subheading": "Whether it's your living room or workspace, we have the perfect piece for you.",
+        "collection_1_label": "Home Collection",
+        "collection_1_cta": "Shop now",
+        "collection_2_label": "Office Collection",
+        "collection_2_cta": "Shop now"
+      }
+    }
+  ]
+}
+{% endschema %}

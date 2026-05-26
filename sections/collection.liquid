@@ -1,0 +1,844 @@
+{%- paginate collection.products by section.settings.products_per_page -%}
+
+{%- comment -%} ── Collection Hero ────────────────────────── {%- endcomment -%}
+<div class="coll-hero{% unless section.settings.show_collection_image and collection.image != blank %} coll-hero--plain{% endunless %}">
+  {%- if section.settings.show_collection_image and collection.image != blank -%}
+    {{- collection.image
+      | image_url: width: 1800, format: 'webp'
+      | image_tag:
+        class: 'coll-hero__img',
+        alt: collection.title,
+        loading: 'eager'
+    -}}
+    <div class="coll-hero__overlay"></div>
+  {%- endif -%}
+
+  <div class="coll-hero__content">
+    <nav class="coll-hero__breadcrumb" aria-label="{{ 'collection.breadcrumb' | t }}">
+      <a href="{{ routes.root_url }}" class="coll-hero__breadcrumb-link">{{ 'general.home' | t }}</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">{{ collection.title }}</span>
+    </nav>
+    <h1 class="coll-hero__title">{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}
+      <p class="coll-hero__desc">{{ collection.description | strip_html | truncate: 160 }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- comment -%} ── Main content ───────────────────────────── {%- endcomment -%}
+<div class="coll-main">
+
+  {%- comment -%} Toolbar {%- endcomment -%}
+  <div class="coll-toolbar">
+    <p class="coll-toolbar__count">
+      {{ 'collection.products_count' | t: count: collection.products_count }}
+    </p>
+
+    <div class="coll-toolbar__sort">
+      <label for="coll-sort" class="coll-toolbar__sort-label">
+        {{ 'collection.sort_by' | t }}
+      </label>
+      <div class="coll-toolbar__select-wrap">
+        <select
+          id="coll-sort"
+          class="coll-toolbar__select"
+          aria-label="{{ 'collection.sort_by' | t }}"
+          onchange="window.location.assign(this.value)"
+        >
+          {%- for option in collection.sort_options -%}
+            <option
+              value="{{ collection.url }}?sort_by={{ option.value }}"
+              {%- if collection.sort_by == option.value %} selected{%- endif -%}
+            >
+              {{ option.name }}
+            </option>
+          {%- endfor -%}
+        </select>
+        <svg class="coll-toolbar__select-icon" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+          <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} Product grid {%- endcomment -%}
+  {%- if collection.products.size > 0 -%}
+    <div
+      class="coll-grid"
+      style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
+    >
+      {%- for product in collection.products -%}
+        {%- liquid
+          assign stagger = forloop.index0 | modulo: section.settings.columns_desktop | times: 90
+          assign is_sale = false
+          if product.compare_at_price > product.price and product.available
+            assign is_sale = true
+            assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+          endif
+          if forloop.index <= 4
+            assign img_load = 'eager'
+          else
+            assign img_load = 'lazy'
+          endif
+        -%}
+
+        <div class="coll-card coll-card--reveal" style="--stagger: {{ stagger }}ms;">
+
+          {%- comment -%} Card media {%- endcomment -%}
+          <div class="coll-card__media">
+            <a href="{{ product.url }}" class="coll-card__img-link" tabindex="-1" aria-hidden="true">
+
+              {%- if product.featured_image != blank -%}
+                {{- product.featured_image
+                  | image_url: width: 800, format: 'webp'
+                  | image_tag:
+                    class: 'coll-card__img coll-card__img--primary',
+                    alt: product.featured_image.alt | default: product.title,
+                    loading: img_load,
+                    width: product.featured_image.width,
+                    height: product.featured_image.height
+                -}}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'coll-card__img coll-card__img--placeholder' }}
+              {%- endif -%}
+
+              {%- if section.settings.show_secondary_image and product.images.size > 1 -%}
+                {{- product.images[1]
+                  | image_url: width: 800, format: 'webp'
+                  | image_tag:
+                    class: 'coll-card__img coll-card__img--secondary',
+                    alt: product.images[1].alt | default: product.title,
+                    loading: 'lazy',
+                    width: product.images[1].width,
+                    height: product.images[1].height
+                -}}
+              {%- endif -%}
+
+              {%- comment -%} Badges {%- endcomment -%}
+              <div class="coll-card__badges">
+                {%- if is_sale -%}
+                  <span class="coll-card__badge coll-card__badge--sale">-{{ discount }}%</span>
+                {%- elsif product.available == false -%}
+                  <span class="coll-card__badge coll-card__badge--sold">{{ 'collection.sold_out' | t }}</span>
+                {%- endif -%}
+              </div>
+
+            </a>
+
+            {%- comment -%} Quick add {%- endcomment -%}
+            {%- if section.settings.enable_quick_add -%}
+              <div class="coll-card__quick-wrap">
+                {%- if product.available -%}
+                  {%- if product.variants.size == 1 -%}
+                    {%- form 'product', product, class: 'coll-card__form' -%}
+                      <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                      <input type="hidden" name="quantity" value="1">
+                      <button type="submit" class="coll-card__quick-btn">
+                        <span>{{ 'collection.add_to_cart' | t }}</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M2 2h1.5l2 8h7l1.5-5H5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                          <circle cx="7" cy="12.5" r="1" fill="currentColor"/>
+                          <circle cx="12" cy="12.5" r="1" fill="currentColor"/>
+                        </svg>
+                      </button>
+                    {%- endform -%}
+                  {%- else -%}
+                    <a href="{{ product.url }}" class="coll-card__quick-btn">
+                      <span>{{ 'collection.choose_options' | t }}</span>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                        <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </a>
+                  {%- endif -%}
+                {%- else -%}
+                  <button class="coll-card__quick-btn coll-card__quick-btn--disabled" disabled>
+                    {{ 'collection.sold_out' | t }}
+                  </button>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- comment -%} Card info {%- endcomment -%}
+          <div class="coll-card__info">
+            {%- if section.settings.show_vendor and product.vendor != blank -%}
+              <p class="coll-card__vendor">{{ product.vendor }}</p>
+            {%- endif -%}
+
+            <a href="{{ product.url }}" class="coll-card__title-link">
+              <h3 class="coll-card__title">{{ product.title | escape }}</h3>
+            </a>
+
+            <div class="coll-card__price-wrap">
+              {%- if product.price_varies -%}
+                <span class="coll-card__from">{{ 'collection.from' | t }}</span>
+                <span class="coll-card__price">{{ product.price_min | money }}</span>
+              {%- elsif is_sale -%}
+                <span class="coll-card__price coll-card__price--sale">{{ product.price | money }}</span>
+                <s class="coll-card__compare">{{ product.compare_at_price | money }}</s>
+              {%- else -%}
+                <span class="coll-card__price">{{ product.price | money }}</span>
+              {%- endif -%}
+            </div>
+          </div>
+
+        </div>
+      {%- endfor -%}
+    </div>
+
+  {%- else -%}
+    <div class="coll-empty">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" opacity=".3"/>
+        <path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <p class="coll-empty__text">{{ 'collection.no_products' | t }}</p>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Pagination {%- endcomment -%}
+  {%- if paginate.pages > 1 -%}
+    <div class="coll-pagination">
+      {{ paginate | default_pagination }}
+    </div>
+  {%- endif -%}
+
+</div>
+
+{%- endpaginate -%}
+
+{% stylesheet %}
+  /* ─────────────────────────────────────────────────────
+     Keyframes
+  ───────────────────────────────────────────────────── */
+  @keyframes coll-card-in {
+    from { opacity: 0; transform: translateY(36px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes coll-hero-in {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Hero
+  ───────────────────────────────────────────────────── */
+  .coll-hero {
+    position: relative;
+    min-height: 340px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: #1c1a18;
+  }
+
+  .coll-hero--plain {
+    min-height: 200px;
+    background: #faf8f5;
+    align-items: center;
+  }
+
+  .coll-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .coll-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  .coll-hero__content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 3rem var(--page-margin);
+    animation: coll-hero-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .coll-hero--plain .coll-hero__content {
+    padding: 2.5rem var(--page-margin);
+  }
+
+  /* Breadcrumb */
+  .coll-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.75rem;
+  }
+
+  .coll-hero--plain .coll-hero__breadcrumb {
+    color: var(--color-foreground);
+    opacity: 0.5;
+  }
+
+  .coll-hero__breadcrumb-link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .coll-hero__breadcrumb-link:hover { opacity: 0.8; }
+
+  /* Title */
+  .coll-hero__title {
+    font-family: var(--font-primary--family);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: #ffffff;
+    margin: 0 0 0.75rem;
+  }
+
+  .coll-hero--plain .coll-hero__title {
+    color: var(--color-foreground);
+  }
+
+  .coll-hero__desc {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    max-width: 54ch;
+  }
+
+  .coll-hero--plain .coll-hero__desc {
+    color: var(--color-foreground);
+    opacity: 0.6;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Main container
+  ───────────────────────────────────────────────────── */
+  .coll-main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin) 5rem;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Toolbar
+  ───────────────────────────────────────────────────── */
+  .coll-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    gap: 1rem;
+  }
+
+  .coll-toolbar__count {
+    font-family: var(--font-primary--family);
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  .coll-toolbar__sort {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .coll-toolbar__sort-label {
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    white-space: nowrap;
+  }
+
+  .coll-toolbar__select-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .coll-toolbar__select {
+    appearance: none;
+    background: none;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 2.25rem 0.5rem 0.875rem;
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .coll-toolbar__select:focus {
+    border-color: var(--color-foreground);
+  }
+
+  .coll-toolbar__select-icon {
+    position: absolute;
+    right: 0.625rem;
+    pointer-events: none;
+    color: var(--color-foreground);
+    opacity: 0.5;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Product grid
+  ───────────────────────────────────────────────────── */
+  .coll-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-mob, 2), 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .coll-grid {
+      grid-template-columns: repeat(var(--cols-desk, 3), 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Product card
+  ───────────────────────────────────────────────────── */
+  .coll-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background);
+  }
+
+  /* Reveal animation */
+  .coll-card--reveal {
+    opacity: 0;
+    transform: translateY(36px);
+    transition:
+      opacity  0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms);
+  }
+
+  .coll-card--reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Media ── */
+  .coll-card__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f2eeea;
+    aspect-ratio: 3 / 4;
+  }
+
+  .coll-card__img-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .coll-card__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .coll-card__img--primary {
+    transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .coll-card:hover .coll-card__img--primary {
+    transform: scale(1.06);
+  }
+
+  .coll-card__img--secondary {
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    z-index: 1;
+  }
+
+  .coll-card:hover .coll-card__img--secondary {
+    opacity: 1;
+  }
+
+  .coll-card__img--placeholder {
+    opacity: 0.2;
+  }
+
+  /* ── Badges ── */
+  .coll-card__badges {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .coll-card__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .coll-card__badge--sale {
+    background: #c0392b;
+    color: #ffffff;
+  }
+
+  .coll-card__badge--sold {
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+  }
+
+  /* ── Quick add ── */
+  .coll-card__quick-wrap {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    padding: 0.75rem;
+    transform: translateY(calc(100% + 1px));
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .coll-card:hover .coll-card__quick-wrap {
+    transform: translateY(0);
+  }
+
+  .coll-card__form { margin: 0; }
+
+  .coll-card__quick-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .coll-card__quick-btn:hover { opacity: 0.82; }
+
+  .coll-card__quick-btn--disabled {
+    background: rgba(0, 0, 0, 0.2);
+    cursor: not-allowed;
+  }
+
+  .coll-card__quick-btn--disabled:hover { opacity: 1; }
+
+  /* ── Info ── */
+  .coll-card__info {
+    padding: 1rem 0.25rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+  }
+
+  .coll-card__vendor {
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    opacity: 0.45;
+    margin: 0;
+  }
+
+  .coll-card__title-link {
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .coll-card__title {
+    font-family: var(--font-primary--family);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    margin: 0;
+    line-height: 1.35;
+    transition: opacity 0.15s ease;
+  }
+
+  .coll-card__title-link:hover .coll-card__title { opacity: 0.65; }
+
+  .coll-card__price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .coll-card__from {
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+    opacity: 0.5;
+  }
+
+  .coll-card__price {
+    font-family: var(--font-primary--family);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+  }
+
+  .coll-card__price--sale { color: #c0392b; }
+
+  .coll-card__compare {
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Empty state
+  ───────────────────────────────────────────────────── */
+  .coll-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    gap: 1.25rem;
+    color: var(--color-foreground);
+  }
+
+  .coll-empty__text {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Pagination
+  ───────────────────────────────────────────────────── */
+  .coll-pagination {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 0 0;
+  }
+
+  .coll-pagination .pagination,
+  .coll-pagination span {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .coll-pagination a,
+  .coll-pagination .current,
+  .coll-pagination span.prev,
+  .coll-pagination span.next {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.5rem;
+    border-radius: 10px;
+    font-family: var(--font-primary--family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-foreground);
+    border: 1.5px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .coll-pagination a:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .coll-pagination .current {
+    background: var(--color-foreground);
+    color: var(--color-background);
+    font-weight: 700;
+  }
+
+  .coll-pagination .prev a,
+  .coll-pagination .next a {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Mobile adjustments
+  ───────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .coll-hero { min-height: 240px; }
+    .coll-main { padding-bottom: 3rem; }
+    .coll-toolbar { padding: 1.25rem 0; margin-bottom: 1.25rem; }
+    .coll-toolbar__sort-label { display: none; }
+    .coll-card__quick-wrap { transform: translateY(0); padding: 0.5rem; }
+    .coll-card__quick-btn { padding: 0.625rem 0.75rem; font-size: 0.75rem; }
+  }
+
+  /* ─────────────────────────────────────────────────────
+     Reduced motion
+  ───────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .coll-card--reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .coll-card__img--primary { transition: none; }
+    .coll-card__img--secondary { transition: none; }
+    .coll-card__quick-wrap { transform: translateY(0); transition: none; }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var cards = document.querySelectorAll('.coll-card--reveal');
+
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      cards.forEach(function (c) { c.classList.add('is-visible'); });
+      return;
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var el = entry.target;
+          el.classList.add('is-visible');
+          var delay = parseInt(el.style.getPropertyValue('--stagger') || '0', 10);
+          setTimeout(function () { el.style.setProperty('--stagger', '0ms'); }, 700 + delay);
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    cards.forEach(function (c) { observer.observe(c); });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.collection",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_image",
+      "label": "t:labels.show_collection_image",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:general.layout"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "t:labels.columns_desktop",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:labels.columns_mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "t:labels.products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:general.product"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:labels.show_vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "t:labels.show_secondary_image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_add",
+      "label": "t:labels.enable_quick_add",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

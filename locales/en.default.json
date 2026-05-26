@@ -1,0 +1,91 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "general": {
+    "home": "Home"
+  },
+  "collection": {
+    "sort_by": "Sort by",
+    "products_count": "{{ count }} products",
+    "sold_out": "Sold out",
+    "add_to_cart": "Add to cart",
+    "choose_options": "Choose options",
+    "from": "From",
+    "no_products": "No products found.",
+    "breadcrumb": "Breadcrumb"
+  },
+  "header": {
+    "navigation": "Navigation",
+    "search": "Search",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close",
+    "account": "Account"
+  },
+  "404": {
+    "title": "404",
+    "not_found": "Page not found.",
+    "back_to_shopping": "Back to shopping"
+  },
+  "blog": {
+    "article_comments": "Comments",
+    "article_metadata_html": "{{ date }} by {{ author }}",
+    "comment_form_body": "Comment",
+    "comment_form_email": "Email",
+    "comment_form_name": "Name",
+    "comment_form_submit": "Post",
+    "comment_form_title": "Add a comment"
+  },
+  "cart": {
+    "checkout": "Checkout",
+    "title": "Cart",
+    "update": "Update",
+    "remove": "Remove"
+  },
+  "customers": {
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "title": "Login"
+    }
+  },
+  "collections": {
+    "title": "Collections"
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Add to Apple Wallet",
+    "card": "Gift card",
+    "expired": "This gift card has expired",
+    "expires_on": "Expires on {{ expires_on }}",
+    "use_at_checkout": "Use this gift card at checkout"
+  },
+  "password": {
+    "title": "This shop is private",
+    "password": "Password",
+    "enter": "Enter"
+  },
+  "footer": {
+    "newsletter_placeholder": "Your email address",
+    "newsletter_submit": "Subscribe",
+    "newsletter_success": "Thank you for subscribing!",
+    "social_instagram": "Follow us on Instagram",
+    "social_facebook": "Follow us on Facebook",
+    "social_pinterest": "Follow us on Pinterest",
+    "social_x": "Follow us on X"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search articles, pages, or products",
+    "submit": "Search",
+    "no_results_html": "No results found for {{ terms }}",
+    "results_for_html": "{{ count }} results found for {{ terms }}"
+  }
+}
