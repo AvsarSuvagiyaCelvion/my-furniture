@@ -1,68 +1,580 @@
-{% comment %}
-  This section is used in the article template to render the article page, which
-  displays the full content of the blog post and can optionally include a
-  comments section for customers (not shown in this example).
+{%- comment -%} Article page — editorial layout, reading progress, comments {%- endcomment -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/article
-{% endcomment %}
+{%- assign word_count = article.content | strip_html | split: ' ' | size -%}
+{%- assign reading_time = word_count | divided_by: 200 | plus: 1 -%}
 
-{% if article.image %}
-  {{ article.image | image_url: width: 1000 | image_tag }}
-{% endif %}
+<article class="article-page">
 
-<h1>{{ article.title }}</h1>
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <div class="article-hero {% unless article.image %}article-hero--no-image{% endunless %}">
+    {%- if article.image -%}
+      <div class="article-hero__media">
+        {{-
+          article.image
+          | image_url: width: 1600, format: 'webp'
+          | image_tag:
+            class: 'article-hero__img',
+            alt: article.image.alt | default: article.title,
+            loading: 'eager',
+            width: 1600,
+            height: 700
+        -}}
+        <div class="article-hero__overlay" aria-hidden="true"></div>
+      </div>
+    {%- endif -%}
 
-{% assign date = article.published_at | time_tag: format: 'date' %}
-<p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
+    <div class="article-hero__content">
+      <nav class="article-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">Home</a>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        <a href="{{ blog.url }}">{{ blog.title }}</a>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        <span>{{ article.title | truncate: 40 }}</span>
+      </nav>
 
-{{ article.content }}
+      <h1 class="article-title">{{ article.title }}</h1>
 
-{% if blog.comments_enabled? %}
-  <h2>{{ 'blog.article_comments' | t }}</h2>
-
-  <div id="comments">
-    {% paginate article.comments by 10 %}
-      {% for comment in article.comments %}
-        <div>
-          <p>{{ comment.author }}</p>
-          <p>
-            {{- comment.created_at | time_tag: format: 'date' -}}
-          </p>
-          <p>{{ comment.content }}</p>
-        </div>
-      {% endfor %}
-
-      {{ paginate | default_pagination: anchor: 'comments' }}
-    {% endpaginate %}
+      <div class="article-meta">
+        <time class="article-meta__date" datetime="{{ article.published_at | date: '%Y-%m-%d' }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {{ article.published_at | date: '%B %d, %Y' }}
+        </time>
+        <span class="article-meta__sep" aria-hidden="true">·</span>
+        <span class="article-meta__author">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          {{ article.author }}
+        </span>
+        <span class="article-meta__sep" aria-hidden="true">·</span>
+        <span class="article-meta__read-time">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ reading_time }} min read
+        </span>
+      </div>
+    </div>
   </div>
 
-  {% form 'new_comment', article %}
-    <h2>{{ 'blog.comment_form_title' | t }}</h2>
+  <!-- ── Reading Progress Bar ──────────────────────────────── -->
+  <div class="article-progress-bar" id="article-progress-bar" aria-hidden="true">
+    <div class="article-progress-bar__fill" id="article-progress-fill"></div>
+  </div>
 
-    {{ form.errors | default_errors }}
-
-    <div>
-      <label for="author">{{ 'blog.comment_form_name' | t }}</label>
-      <input type="text" name="comment[author]" id="author" value="{{ form.author }}" required>
+  <!-- ── Content ──────────────────────────────────────────── -->
+  <div class="article-body">
+    <div class="article-content rte" id="article-content">
+      {{ article.content }}
     </div>
 
-    <div>
-      <label for="email">{{ 'blog.comment_form_email' | t }}</label>
-      <input type="email" name="comment[email]" id="email" value="{{ form.email }}" required>
-    </div>
+    <!-- Tags -->
+    {%- if article.tags.size > 0 -%}
+      <div class="article-tags">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        {%- for tag in article.tags -%}
+          <a href="{{ blog.url }}/tagged/{{ tag | handle }}" class="article-tag">{{ tag }}</a>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
 
-    <div>
-      <label for="body">{{ 'blog.comment_form_body' | t }}</label>
-      <textarea name="comment[body]" id="body" required>{{ form.body }}</textarea>
+    <!-- Back to blog -->
+    <div class="article-footer-nav">
+      <a href="{{ blog.url }}" class="article-back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to {{ blog.title }}
+      </a>
     </div>
+  </div>
 
-    <input type="submit" value="{{ 'blog.comment_form_submit' | t }}">
-  {% endform %}
-{% endif %}
+  <!-- ── Comments ──────────────────────────────────────────── -->
+  {%- if blog.comments_enabled? -%}
+    <section class="article-comments" aria-labelledby="comments-heading">
+      <div class="article-comments__inner">
+
+        {%- if article.comments_count > 0 -%}
+          <h2 class="comments-heading" id="comments-heading">
+            {{ article.comments_count }}
+            {{ article.comments_count | pluralize: 'Comment', 'Comments' }}
+          </h2>
+
+          <div id="comments">
+            {%- paginate article.comments by 10 -%}
+              {%- for comment in article.comments -%}
+                <div class="comment" id="comment-{{ comment.id }}">
+                  <div class="comment__avatar" aria-hidden="true">
+                    {{ comment.author | slice: 0 | upcase }}
+                  </div>
+                  <div class="comment__body">
+                    <div class="comment__header">
+                      <strong class="comment__author">{{ comment.author }}</strong>
+                      <time class="comment__date" datetime="{{ comment.created_at | date: '%Y-%m-%d' }}">
+                        {{ comment.created_at | date: '%B %d, %Y' }}
+                      </time>
+                    </div>
+                    <p class="comment__text">{{ comment.content }}</p>
+                  </div>
+                </div>
+              {%- endfor -%}
+              {%- if paginate.pages > 1 -%}
+                <div class="comments-pagination">
+                  {{ paginate | default_pagination: anchor: 'comments' }}
+                </div>
+              {%- endif -%}
+            {%- endpaginate -%}
+          </div>
+        {%- else -%}
+          <p class="no-comments">Be the first to leave a comment!</p>
+        {%- endif -%}
+
+        <!-- Comment form -->
+        <div class="comment-form-wrap">
+          <h3 class="comment-form-title">Leave a Comment</h3>
+          {%- form 'new_comment', article -%}
+            {{ form.errors | default_errors }}
+            <div class="comment-form__grid">
+              <div class="comment-form__field">
+                <label class="comment-form__label" for="comment-author">Name</label>
+                <input
+                  type="text"
+                  name="comment[author]"
+                  id="comment-author"
+                  class="comment-form__input"
+                  value="{{ form.author }}"
+                  placeholder="Your name"
+                  required
+                  autocomplete="name"
+                >
+              </div>
+              <div class="comment-form__field">
+                <label class="comment-form__label" for="comment-email">Email</label>
+                <input
+                  type="email"
+                  name="comment[email]"
+                  id="comment-email"
+                  class="comment-form__input"
+                  value="{{ form.email }}"
+                  placeholder="your@email.com"
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+            <div class="comment-form__field">
+              <label class="comment-form__label" for="comment-body">Comment</label>
+              <textarea
+                name="comment[body]"
+                id="comment-body"
+                class="comment-form__textarea"
+                rows="5"
+                placeholder="Share your thoughts..."
+                required
+              >{{ form.body }}</textarea>
+            </div>
+            <button type="submit" class="comment-form__submit">
+              Post Comment
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          {%- endform -%}
+        </div>
+
+      </div>
+    </section>
+  {%- endif -%}
+
+</article>
+
+<script>
+  (function() {
+    var fill = document.getElementById('article-progress-fill');
+    var content = document.getElementById('article-content');
+    if (!fill || !content) return;
+
+    function updateProgress() {
+      var start = content.offsetTop;
+      var end = start + content.offsetHeight - window.innerHeight;
+      var progress = end > 0 ? Math.min(Math.max((window.scrollY - start) / end, 0), 1) : 0;
+      fill.style.width = (progress * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  })();
+</script>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────── */
+  .article-page {
+    background: #fafaf8;
+  }
+  .article-hero {
+    position: relative;
+    min-height: 480px;
+    display: flex;
+    align-items: flex-end;
+    background: #111;
+    overflow: hidden;
+  }
+  .article-hero--no-image {
+    min-height: 280px;
+    background: #1a1a1a;
+  }
+  .article-hero__media {
+    position: absolute;
+    inset: 0;
+  }
+  .article-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .article-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.1) 100%);
+  }
+  .article-hero__content {
+    position: relative;
+    z-index: 1;
+    padding: 60px 40px 48px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Breadcrumb */
+  .article-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
+  }
+  .article-breadcrumb a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .article-breadcrumb a:hover { color: #c49a5e; }
+  .article-breadcrumb svg { color: rgba(255,255,255,0.25); flex-shrink: 0; }
+  .article-breadcrumb span { color: rgba(255,255,255,0.8); }
+
+  .article-title {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 18px;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.6);
+  }
+  .article-meta time,
+  .article-meta__author,
+  .article-meta__read-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .article-meta time { color: #c49a5e; }
+  .article-meta__sep { opacity: 0.3; }
+
+  /* ── Reading progress ──────────────────────────────────── */
+  .article-progress-bar {
+    position: sticky;
+    top: 72px;
+    z-index: 100;
+    height: 3px;
+    background: rgba(0,0,0,0.08);
+  }
+  .article-progress-bar__fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #c49a5e, #d4aa6e);
+    transition: width 0.1s linear;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* ── Article body ──────────────────────────────────────── */
+  .article-body {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* Rich text */
+  .article-content {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #444;
+  }
+  .article-content h1,
+  .article-content h2,
+  .article-content h3,
+  .article-content h4 {
+    color: #111;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 2.2em 0 0.7em;
+    line-height: 1.2;
+  }
+  .article-content h2 {
+    font-size: 1.5rem;
+    border-left: 4px solid #c49a5e;
+    padding-left: 14px;
+  }
+  .article-content h3 { font-size: 1.2rem; }
+  .article-content p { margin: 0 0 1.3em; }
+  .article-content a { color: #c49a5e; text-underline-offset: 3px; }
+  .article-content a:hover { color: #a07840; }
+  .article-content img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 1.5em 0;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  }
+  .article-content blockquote {
+    border-left: 4px solid #c49a5e;
+    margin: 2em 0;
+    padding: 16px 24px;
+    background: rgba(196,154,94,0.06);
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #666;
+    font-size: 1.1rem;
+  }
+  .article-content ul,
+  .article-content ol {
+    padding-left: 1.5em;
+    margin: 0 0 1.3em;
+    color: #555;
+  }
+  .article-content li { margin-bottom: 0.4em; }
+  .article-content hr {
+    border: none;
+    height: 1px;
+    background: #e8e5e0;
+    margin: 2.5em 0;
+  }
+
+  /* Tags */
+  .article-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid #e8e5e0;
+    font-size: 0.82rem;
+    color: #aaa;
+  }
+  .article-tags svg { color: #c49a5e; flex-shrink: 0; }
+  .article-tag {
+    padding: 5px 14px;
+    background: #f0ede8;
+    color: #666;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+  }
+  .article-tag:hover {
+    background: #c49a5e;
+    color: #fff;
+  }
+
+  /* Back link */
+  .article-footer-nav {
+    margin-top: 40px;
+  }
+  .article-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #888;
+    text-decoration: none;
+    transition: color 0.2s, gap 0.2s;
+  }
+  .article-back-link:hover {
+    color: #c49a5e;
+    gap: 12px;
+  }
+
+  /* ── Comments ──────────────────────────────────────────── */
+  .article-comments {
+    background: #f4f2ee;
+    padding: 64px 24px 80px;
+    border-top: 1px solid #e8e5e0;
+  }
+  .article-comments__inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .comments-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.02em;
+    margin: 0 0 32px;
+  }
+  .no-comments {
+    color: #aaa;
+    font-style: italic;
+    margin-bottom: 40px;
+  }
+
+  /* Individual comment */
+  .comment {
+    display: flex;
+    gap: 16px;
+    padding: 24px 0;
+    border-bottom: 1px solid #e8e5e0;
+  }
+  .comment__avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #c49a5e;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .comment__header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .comment__author {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111;
+  }
+  .comment__date {
+    font-size: 0.75rem;
+    color: #aaa;
+  }
+  .comment__text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #555;
+    margin: 0;
+  }
+
+  /* Comment form */
+  .comment-form-wrap {
+    margin-top: 48px;
+    padding-top: 40px;
+    border-top: 1px solid #e0ddd8;
+  }
+  .comment-form-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.02em;
+    margin: 0 0 28px;
+  }
+  .comment-form__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .comment-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .comment-form__grid .comment-form__field { margin-bottom: 0; }
+  .comment-form__label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+  }
+  .comment-form__input,
+  .comment-form__textarea {
+    padding: 12px 16px;
+    border: 1.5px solid #e0ddd8;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #111;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .comment-form__input:focus,
+  .comment-form__textarea:focus {
+    outline: none;
+    border-color: #c49a5e;
+    box-shadow: 0 0 0 4px rgba(196,154,94,0.1);
+  }
+  .comment-form__textarea { resize: vertical; }
+  .comment-form__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.22s, transform 0.22s, box-shadow 0.22s;
+    margin-top: 8px;
+  }
+  .comment-form__submit:hover {
+    background: #c49a5e;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(196,154,94,0.3);
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .article-hero { min-height: 360px; }
+    .article-hero--no-image { min-height: 220px; }
+    .article-hero__content { padding: 40px 20px 36px; }
+    .article-body { padding: 40px 20px 60px; }
+    .comment-form__grid { grid-template-columns: 1fr; }
+    .article-comments { padding: 48px 20px 60px; }
+  }
+</style>
 
 {% schema %}
 {
   "name": "t:general.article",
-  "settings": []
+  "settings": [],
+  "presets": [
+    {
+      "name": "Article"
+    }
+  ]
 }
 {% endschema %}

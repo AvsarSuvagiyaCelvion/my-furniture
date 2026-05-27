@@ -24,6 +24,8 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
+
+    {{ 'scroll-animations.css' | asset_url | stylesheet_tag }}
   </head>
 
   <body>
@@ -36,5 +38,7 @@
     </main>
 
     {% sections 'footer-group' %}
+
+    <script src="{{ 'scroll-animations.js' | asset_url }}" defer></script>
   </body>
 </html>

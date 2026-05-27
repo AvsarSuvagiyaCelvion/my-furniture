@@ -48,7 +48,6 @@
                 </a>
                 <div class="blog-card__body">
                   <div class="blog-card__meta">
-                    {%- assign date = article.published_at | time_tag: format: 'date' -%}
                     <time class="blog-card__date">{{ article.published_at | date: '%b %d, %Y' }}</time>
                     <span class="blog-card__dot" aria-hidden="true"></span>
                     <span class="blog-card__author">{{ article.author }}</span>

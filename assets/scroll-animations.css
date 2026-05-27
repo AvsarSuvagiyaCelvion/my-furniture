@@ -1,0 +1,155 @@
+/* ═══════════════════════════════════════════════════════════════
+   Scroll Animations — Global animation system for WoodenCraft
+   Handles: scroll reveal, progress bar, back-to-top, header shrink
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Scroll Reveal ─────────────────────────────────────────────── */
+/* JS adds .wf-reveal to sections below the fold, .wf-visible on intersect */
+.wf-reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition:
+    opacity 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.78s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.wf-reveal.wf-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Cards inside a revealed section stagger in */
+.wf-reveal.wf-visible .product-card,
+.wf-reveal.wf-visible .result-card,
+.wf-reveal.wf-visible .blog-card,
+.wf-reveal.wf-visible .collection-card {
+  animation: wf-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* animation-delay set inline by JS */
+}
+
+.wf-reveal .product-card,
+.wf-reveal .result-card,
+.wf-reveal .blog-card,
+.wf-reveal .collection-card {
+  /* disable existing keyframe animations while hidden */
+  animation-play-state: paused;
+}
+
+@keyframes wf-card-in {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Global Scroll Progress Bar (top of viewport) ─────────────── */
+.wf-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #c49a5e 0%, #d4b07a 60%, #e8c87e 100%);
+  z-index: 10000;
+  pointer-events: none;
+  transition: width 0.08s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Back to Top Button ────────────────────────────────────────── */
+.wf-back-to-top {
+  position: fixed;
+  bottom: 32px;
+  right: 24px;
+  width: 50px;
+  height: 50px;
+  background: #1a1a1a;
+  color: #c49a5e;
+  border: 1.5px solid rgba(196, 154, 94, 0.35);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 998;
+  opacity: 0;
+  transform: translateY(18px) scale(0.75);
+  transition:
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+.wf-back-to-top.wf-btt-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.wf-back-to-top:hover {
+  background: #c49a5e;
+  color: #fff;
+  border-color: #c49a5e;
+  box-shadow: 0 14px 36px rgba(196, 154, 94, 0.4);
+  transform: translateY(-4px);
+}
+.wf-back-to-top:active {
+  transform: translateY(-1px);
+}
+
+/* ── Header Compact (shrinks when scrolled) ────────────────────── */
+.header.wf-header-compact {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+/* Fine-tune logo + nav font sizes when compact */
+.header.wf-header-compact .header__logo-img {
+  max-height: 36px;
+  transition: max-height 0.3s ease;
+}
+.header.wf-header-compact .header__logo-wordmark {
+  font-size: 1.1rem;
+  transition: font-size 0.3s ease;
+}
+
+/* ── Smooth Scrolling ──────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Page Entrance ─────────────────────────────────────────────── */
+@keyframes wf-page-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body.wf-loading {
+  animation: wf-page-enter 0.4s ease both;
+}
+
+/* ── Reduced Motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .wf-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .wf-reveal .product-card,
+  .wf-reveal .result-card,
+  .wf-reveal .blog-card,
+  .wf-reveal .collection-card {
+    animation: none !important;
+  }
+  .wf-back-to-top {
+    transition: background 0.2s, box-shadow 0.2s !important;
+  }
+}
+
+/* ── Mobile adjustments ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wf-back-to-top {
+    bottom: 20px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+  }
+}

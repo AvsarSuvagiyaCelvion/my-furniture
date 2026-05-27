@@ -1,584 +1,303 @@
-{%- comment -%} Product Detail Page — thumbnail gallery, breadcrumb, trust badges, qty +/− {%- endcomment -%}
+{%- comment -%} Professional Product Detail Page — Refined & Modern {%- endcomment -%}
 
 <section class="product-page" style="--product-accent: {{ section.settings.accent_color }};">
 
-  <!-- Breadcrumb -->
-  <div class="pdp-breadcrumb">
+  <!-- Breadcrumb: Minimalist & Clean -->
+  <nav class="pdp-breadcrumb" aria-label="Breadcrumb">
     <div class="pdp-breadcrumb__inner">
       <a href="{{ routes.root_url }}">Home</a>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      <span class="pdp-breadcrumb__sep">/</span>
       {%- for collection in product.collections limit: 1 -%}
         <a href="{{ collection.url }}">{{ collection.title }}</a>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        <span class="pdp-breadcrumb__sep">/</span>
       {%- endfor -%}
-      <span>{{ product.title }}</span>
+      <span class="pdp-breadcrumb__current">{{ product.title }}</span>
     </div>
-  </div>
+  </nav>
 
   <div class="product-page__inner">
 
-    <!-- ── Left: Image Gallery ───────────────────────────── -->
+    <!-- ── Left: Premium Image Gallery ───────────────────── -->
     <div class="product-gallery">
-      <!-- Main image -->
-      <div class="product-gallery__main" id="gallery-main">
-        <div class="product-gallery__main-img-wrap" id="main-img-wrap">
-          {%- if product.featured_image -%}
-            {{-
-              product.featured_image
-              | image_url: width: 900, format: 'webp'
-              | image_tag:
-                class: 'product-gallery__main-img',
-                id: 'main-product-image',
-                alt: product.title,
-                loading: 'eager',
-                width: 900,
-                height: 900
-            -}}
-          {%- else -%}
-            {{ 'product-1' | placeholder_svg_tag: 'product-gallery__placeholder' }}
-          {%- endif -%}
-          {%- if product.compare_at_price > product.price -%}
-            {%- assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
-            <span class="pdp-badge pdp-badge--sale">−{{ savings }}%</span>
-          {%- endif -%}
-        </div>
-      </div>
-
-      <!-- Thumbnails -->
-      {%- if product.images.size > 1 -%}
-        <div class="product-gallery__thumbs" role="list" aria-label="Product images">
-          {%- for image in product.images -%}
-            <button
-              type="button"
-              class="thumb-btn {% if forloop.first %}thumb-btn--active{% endif %}"
-              data-src="{{ image | image_url: width: 900, format: 'webp' }}"
-              data-alt="{{ image.alt | default: product.title | escape }}"
-              aria-label="View image {{ forloop.index }}"
-              role="listitem"
-            >
+      <div class="product-gallery__sticky">
+        <div class="product-gallery__main">
+          <div class="product-gallery__main-img-wrap" id="main-img-wrap">
+            {%- if product.featured_image -%}
               {{-
-                image
-                | image_url: width: 160, format: 'webp'
+                product.featured_image
+                | image_url: width: 1000, format: 'webp'
                 | image_tag:
-                  class: 'thumb-btn__img',
-                  alt: image.alt | default: product.title,
-                  loading: 'lazy',
-                  width: 80,
-                  height: 80
+                  class: 'product-gallery__main-img',
+                  id: 'main-product-image',
+                  alt: product.title,
+                  loading: 'eager'
               -}}
-            </button>
-          {%- endfor -%}
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'product-gallery__placeholder' }}
+            {%- endif -%}
+            
+            {%- if product.compare_at_price > product.price -%}
+              {%- assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+              <span class="pdp-badge-sale">SAVE {{ savings }}%</span>
+            {%- endif -%}
+          </div>
         </div>
-      {%- endif -%}
+
+        {%- if product.images.size > 1 -%}
+          <div class="product-gallery__thumbs">
+            {%- for image in product.images -%}
+              <button
+                type="button"
+                class="thumb-item {% if forloop.first %}is-active{% endif %}"
+                data-src="{{ image | image_url: width: 1000, format: 'webp' }}"
+                data-alt="{{ image.alt | escape }}"
+              >
+                <img src="{{ image | image_url: width: 120, height: 120, crop: 'center' }}" alt="{{ image.alt }}" loading="lazy">
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
     </div>
 
-    <!-- ── Right: Details + Form ─────────────────────────── -->
+    <!-- ── Right: Modern Product Details ─────────────────── -->
     <div class="product-page__details">
-
-      <div class="product-info">
+      <div class="product-details__header">
         {%- if product.vendor != blank -%}
-          <p class="product-info__vendor">{{ product.vendor }}</p>
+          <span class="product-vendor">{{ product.vendor }}</span>
         {%- endif -%}
+        <h1 class="product-title">{{ product.title }}</h1>
 
-        <h1 class="product-info__title">{{ product.title }}</h1>
-
-        <div class="product-info__pricing">
-          <span class="product-info__price">{{ product.price | money }}</span>
+        <div class="product-price-row">
+          <span class="price-main">{{ product.price | money }}</span>
           {%- if product.compare_at_price > product.price -%}
-            <span class="product-info__compare">{{ product.compare_at_price | money }}</span>
+            <span class="price-compare">{{ product.compare_at_price | money }}</span>
           {%- endif -%}
-        </div>
-
-        <div class="product-info__description rte">
-          {{ product.description }}
         </div>
       </div>
 
-      <div class="product-form">
+      <div class="product-description rte">
+        {{ product.description }}
+      </div>
+
+      <div class="product-form-container">
         {% form 'product', product %}
-          {% assign current_variant = product.selected_or_first_available_variant %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
 
           {%- if product.variants.size > 1 -%}
-            <div class="product-form__field">
-              <label class="product-form__label" for="product-variant">Variant</label>
-              <div class="product-form__select-wrap">
-                <select name="id" id="product-variant" class="product-form__select">
+            <div class="form-field">
+              <label class="field-label">Select Option</label>
+              <div class="custom-select">
+                <select name="id" class="variant-select">
                   {% for variant in product.variants %}
-                    <option
-                      value="{{ variant.id }}"
-                      {% if variant == current_variant %}selected="selected"{% endif %}
-                    >
+                    <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
                       {{ variant.title }} — {{ variant.price | money }}
                     </option>
                   {% endfor %}
                 </select>
-                <svg class="product-form__select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-                  <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
             </div>
-          {%- else -%}
-            <select name="id" hidden>
-              <option value="{{ current_variant.id }}" selected="selected">{{ current_variant.title }}</option>
-            </select>
           {%- endif -%}
 
-          <!-- Quantity with +/− -->
-          <div class="product-form__field">
-            <label class="product-form__label" for="product-quantity">Quantity</label>
-            <div class="pdp-qty-wrap">
-              <button
-                type="button"
-                class="pdp-qty-btn"
-                id="pdp-qty-dec"
-                aria-label="Decrease quantity"
-              >−</button>
-              <input
-                type="number"
-                name="quantity"
-                id="product-quantity"
-                class="product-form__qty"
-                min="1"
-                value="1"
-              >
-              <button
-                type="button"
-                class="pdp-qty-btn"
-                id="pdp-qty-inc"
-                aria-label="Increase quantity"
-              >+</button>
+          <div class="form-field">
+            <label class="field-label">Quantity</label>
+            <div class="qty-selector">
+              <button type="button" class="qty-btn" data-action="minus">−</button>
+              <input type="number" name="quantity" value="1" min="1" class="qty-input">
+              <button type="button" class="qty-btn" data-action="plus">+</button>
             </div>
           </div>
 
-          <div class="product-form__buttons">
-            <button type="submit" class="product-form__submit" name="add">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-              Add to Cart
+          <div class="form-actions">
+            <button type="submit" class="btn-add-to-cart" {% unless product.available %}disabled{% endunless %}>
+              {% if product.available %}Add to Bag{% else %}Sold Out{% endif %}
             </button>
-            {{ form | payment_button }}
+            <div class="pdp-dynamic-checkout">
+              {{ form | payment_button }}
+            </div>
           </div>
         {% endform %}
       </div>
 
-      <!-- Trust badges -->
-      <div class="pdp-trust">
-        <div class="pdp-trust__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Secure Payment</span>
+      <!-- Trust Bar: Elegant Icons -->
+      <div class="trust-bar">
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Secure Checkout</span>
         </div>
-        <div class="pdp-trust__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 12 23 17 16 17 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-          <span>Free Delivery</span>
-        </div>
-        <div class="pdp-trust__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
-          <span>30-Day Returns</span>
-        </div>
-        <div class="pdp-trust__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span>Fast Support</span>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 12 23 17 16 17 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span>Fast Shipping</span>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
 {% stylesheet %}
-  /* ── Breadcrumb ──────────────────────────────────────── */
-  .pdp-breadcrumb {
-    background: #fafaf8;
-    border-bottom: 1px solid #ebebeb;
-    padding: 12px 0;
+  :root {
+    --pdp-bg: #ffffff;
+    --pdp-text: #1a1a1a;
+    --pdp-text-light: #666666;
+    --pdp-border: #e8e8e8;
+    --radius-lg: 12px;
+    --radius-sm: 8px;
   }
-  .pdp-breadcrumb__inner {
-    max-width: var(--page-width, 1400px);
-    margin: 0 auto;
-    padding: 0 var(--page-margin, 24px);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    font-size: 0.78rem;
-    color: #999;
-  }
-  .pdp-breadcrumb__inner a {
-    color: #888;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .pdp-breadcrumb__inner a:hover { color: var(--product-accent, #c49a5e); }
-  .pdp-breadcrumb__inner span { color: #444; font-weight: 600; }
-  .pdp-breadcrumb__inner svg { color: #ccc; flex-shrink: 0; }
 
-  /* ── Section shell ──────────────────────────────────── */
   .product-page {
-    padding: 48px 0 80px;
-    background: #fafaf8;
+    background: var(--pdp-bg);
+    padding: 40px 0;
+    color: var(--pdp-text);
   }
+
   .product-page__inner {
-    max-width: var(--page-width, 1400px);
+    max-width: 1300px;
     margin: 0 auto;
-    padding: 0 var(--page-margin, 24px);
+    padding: 0 24px;
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 56px;
-    align-items: start;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 60px;
   }
 
-  /* ── Gallery ──────────────────────────────────────── */
-  .product-gallery__main {
-    border-radius: 16px;
-    overflow: hidden;
-    background: #f0ede8;
-    margin-bottom: 14px;
+  /* ── Breadcrumb ── */
+  .pdp-breadcrumb { margin-bottom: 30px; border-bottom: 1px solid var(--pdp-border); padding-bottom: 15px; }
+  .pdp-breadcrumb__inner { max-width: 1300px; margin: 0 auto; padding: 0 24px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--pdp-text-light); }
+  .pdp-breadcrumb__inner a { text-decoration: none; color: inherit; transition: color 0.2s; }
+  .pdp-breadcrumb__inner a:hover { color: var(--product-accent); }
+  .pdp-breadcrumb__sep { margin: 0 8px; opacity: 0.4; }
+  .pdp-breadcrumb__current { font-weight: 700; color: var(--pdp-text); }
+
+  /* ── Gallery ── */
+  .product-gallery__sticky { position: sticky; top: 100px; }
+  .product-gallery__main { 
+    background: #fbfbfb; 
+    border-radius: var(--radius-lg); 
+    overflow: hidden; 
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.02);
   }
-  .product-gallery__main-img-wrap {
-    position: relative;
-    aspect-ratio: 1/1;
-    overflow: hidden;
-    cursor: zoom-in;
-  }
-  .product-gallery__main-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .product-gallery__main-img-wrap:hover .product-gallery__main-img {
-    transform: scale(1.04);
-  }
-  .product-gallery__placeholder {
-    width: 100%;
-    opacity: 0.25;
+  .product-gallery__main-img-wrap { position: relative; aspect-ratio: 4/5; }
+  .product-gallery__main-img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease; }
+  
+  .pdp-badge-sale {
+    position: absolute; top: 20px; left: 20px;
+    background: #000; color: #fff;
+    padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px;
   }
 
-  .pdp-badge {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    z-index: 2;
+  .product-gallery__thumbs { display: flex; gap: 12px; flex-wrap: wrap; }
+  .thumb-item { 
+    width: 80px; height: 100px; border-radius: var(--radius-sm); border: 1px solid var(--pdp-border);
+    overflow: hidden; cursor: pointer; background: none; padding: 0; transition: 0.3s;
   }
-  .pdp-badge--sale {
-    background: var(--product-accent, #c49a5e);
-    color: #fff;
+  .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb-item.is-active { border-color: var(--product-accent); box-shadow: 0 0 0 1px var(--product-accent); }
+
+  /* ── Product Info ── */
+  .product-vendor { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--product-accent); letter-spacing: 2px; margin-bottom: 10px; }
+  .product-title { font-size: 34px; font-weight: 800; line-height: 1.2; margin: 0 0 15px; letter-spacing: -0.5px; }
+  
+  .product-price-row { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+  .price-main { font-size: 24px; font-weight: 700; color: var(--pdp-text); }
+  .price-compare { font-size: 18px; text-decoration: line-through; color: #aaa; }
+
+  .product-description { font-size: 15px; line-height: 1.6; color: var(--pdp-text-light); margin-bottom: 30px; }
+
+  /* ── Form Elements ── */
+  .form-field { margin-bottom: 20px; }
+  .field-label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; color: #999; }
+  
+  .custom-select { position: relative; }
+  .variant-select { 
+    width: 100%; padding: 14px; border: 1px solid var(--pdp-border); border-radius: var(--radius-sm);
+    appearance: none; font-size: 14px; cursor: pointer; transition: 0.3s;
+  }
+  .variant-select:focus { outline: none; border-color: var(--product-accent); }
+  .custom-select svg { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+
+  .qty-selector { display: flex; width: 130px; border: 1px solid var(--pdp-border); border-radius: var(--radius-sm); }
+  .qty-btn { width: 40px; height: 45px; border: none; background: none; cursor: pointer; font-size: 18px; }
+  .qty-input { width: 50px; border: none; text-align: center; font-weight: 700; -moz-appearance: textfield; }
+  .qty-input::-webkit-inner-spin-button { display: none; }
+
+  /* ── Action Buttons ── */
+  .form-actions { margin-top: 35px; display: flex; flex-direction: column; gap: 12px; }
+  .btn-add-to-cart { 
+    background: #000; color: #fff; border: none; padding: 18px; 
+    border-radius: var(--radius-sm); font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; cursor: pointer; transition: 0.3s;
+  }
+  .btn-add-to-cart:hover { background: var(--product-accent); transform: translateY(-2px); }
+  
+  .pdp-dynamic-checkout .shopify-payment-button__button--unbranded { 
+    border-radius: var(--radius-sm) !important; padding: 18px !important;
   }
 
-  /* Thumbnail strip */
-  .product-gallery__thumbs {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .thumb-btn {
-    width: 72px;
-    height: 72px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid transparent;
-    cursor: pointer;
-    padding: 0;
-    background: #f0ede8;
-    transition: border-color 0.2s, transform 0.2s;
-    flex-shrink: 0;
-  }
-  .thumb-btn:hover {
-    border-color: rgba(196,154,94,0.5);
-    transform: translateY(-2px);
-  }
-  .thumb-btn--active {
-    border-color: var(--product-accent, #c49a5e);
-  }
-  .thumb-btn__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-  }
+  /* ── Trust Bar ── */
+  .trust-bar { display: flex; gap: 30px; margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--pdp-border); }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+  .trust-item svg { width: 20px; height: 20px; color: var(--product-accent); }
 
-  /* ── Product details ──────────────────────────────── */
-  .product-page__details {
-    position: sticky;
-    top: 90px;
-  }
-
-  .product-info__vendor {
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--product-accent, #c49a5e);
-    margin: 0 0 10px;
-  }
-  .product-info__title {
-    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-    font-weight: 800;
-    line-height: 1.12;
-    letter-spacing: -0.03em;
-    color: #111;
-    margin: 0 0 16px;
-  }
-
-  /* Pricing */
-  .product-info__pricing {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .product-info__price {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--product-accent, #c49a5e);
-  }
-  .product-info__compare {
-    font-size: 1rem;
-    color: #bbb;
-    text-decoration: line-through;
-  }
-
-  .product-info__description {
-    font-size: 0.95rem;
-    line-height: 1.75;
-    color: #555;
-    margin: 0 0 28px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #ebebeb;
-  }
-  .product-info__description p { margin: 0 0 0.6rem; }
-
-  /* ── Form ─────────────────────────────────────────── */
-  .product-form__field {
-    margin-bottom: 18px;
-  }
-  .product-form__label {
-    display: block;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #999;
-    margin-bottom: 8px;
-  }
-
-  /* Variant select */
-  .product-form__select-wrap { position: relative; }
-  .product-form__select {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 100%;
-    padding: 13px 40px 13px 16px;
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: #111;
-    background: #fff;
-    border: 1.5px solid #e0ddd8;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .product-form__select:focus {
-    outline: none;
-    border-color: var(--product-accent, #c49a5e);
-    box-shadow: 0 0 0 4px rgba(196,154,94,0.12);
-  }
-  .product-form__select-arrow {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #aaa;
-    pointer-events: none;
-  }
-
-  /* Qty +/− wrapper */
-  .pdp-qty-wrap {
-    display: inline-flex;
-    align-items: center;
-    border: 1.5px solid #e0ddd8;
-    border-radius: 999px;
-    overflow: hidden;
-    background: #fff;
-    transition: border-color 0.2s;
-  }
-  .pdp-qty-wrap:focus-within {
-    border-color: var(--product-accent, #c49a5e);
-  }
-  .pdp-qty-btn {
-    width: 44px;
-    height: 46px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #555;
-    transition: background 0.2s, color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .pdp-qty-btn:hover {
-    background: var(--product-accent, #c49a5e);
-    color: #fff;
-  }
-  .product-form__qty {
-    width: 52px;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111;
-    font-family: inherit;
-    -moz-appearance: textfield;
-    padding: 0;
-  }
-  .product-form__qty::-webkit-outer-spin-button,
-  .product-form__qty::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .product-form__qty:focus { outline: none; }
-
-  /* Buttons */
-  .product-form__buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 24px;
-  }
-  .product-form__submit {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 16px 24px;
-    background: var(--product-accent, #c49a5e);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
-  }
-  .product-form__submit:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.08);
-    box-shadow: 0 16px 36px rgba(196,154,94,0.35);
-  }
-  .product-form__submit:active { transform: translateY(-1px); }
-  .product-form__buttons .shopify-payment-button { width: 100%; }
-
-  /* ── Trust badges ─────────────────────────────────── */
-  .pdp-trust {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 28px;
-    padding-top: 24px;
-    border-top: 1px solid #ebebeb;
-  }
-  .pdp-trust__item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #666;
-  }
-  .pdp-trust__item svg {
-    color: var(--product-accent, #c49a5e);
-    flex-shrink: 0;
-  }
-
-  /* ── Responsive ───────────────────────────────────── */
-  @media (max-width: 960px) {
-    .product-page__inner {
-      grid-template-columns: 1fr;
-      gap: 32px;
-    }
-    .product-page__details { position: static; }
-  }
-  @media (max-width: 480px) {
-    .product-page { padding: 24px 0 60px; }
-    .pdp-trust { grid-template-columns: 1fr; }
-    .thumb-btn { width: 60px; height: 60px; }
+  @media (max-width: 900px) {
+    .product-page__inner { grid-template-columns: 1fr; }
+    .product-gallery__sticky { position: static; }
+    .product-title { font-size: 28px; }
   }
 {% endstylesheet %}
 
 <script>
-  (function() {
-    // Thumbnail switcher
-    var mainImg = document.getElementById('main-product-image');
-    var thumbBtns = document.querySelectorAll('.thumb-btn');
-    thumbBtns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        if (!mainImg) return;
-        var src = this.getAttribute('data-src');
-        var alt = this.getAttribute('data-alt');
-        if (src) {
-          mainImg.style.opacity = '0';
-          mainImg.style.transform = 'scale(0.97)';
-          setTimeout(function() {
-            mainImg.src = src;
-            mainImg.alt = alt || '';
-            mainImg.style.opacity = '1';
-            mainImg.style.transform = 'scale(1)';
-          }, 200);
-        }
-        thumbBtns.forEach(function(b) { b.classList.remove('thumb-btn--active'); });
-        this.classList.add('thumb-btn--active');
+  document.addEventListener('DOMContentLoaded', function() {
+    // Gallery Switcher
+    const mainImg = document.getElementById('main-product-image');
+    const thumbs = document.querySelectorAll('.thumb-item');
+
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        const newSrc = this.dataset.src;
+        mainImg.style.opacity = '0';
+        
+        setTimeout(() => {
+          mainImg.src = newSrc;
+          mainImg.style.opacity = '1';
+        }, 200);
+
+        thumbs.forEach(t => t.classList.remove('is-active'));
+        this.classList.add('is-active');
       });
     });
-    if (mainImg) {
-      mainImg.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-    }
 
-    // Qty +/−
-    var qtyInput = document.getElementById('product-quantity');
-    var qtyDec = document.getElementById('pdp-qty-dec');
-    var qtyInc = document.getElementById('pdp-qty-inc');
-    if (qtyInput && qtyDec && qtyInc) {
-      qtyDec.addEventListener('click', function() {
-        qtyInput.value = Math.max(1, parseInt(qtyInput.value || 1) - 1);
+    // Quantity Logic
+    const qtyInput = document.querySelector('.qty-input');
+    const qtyBtns = document.querySelectorAll('.qty-btn');
+
+    qtyBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        let val = parseInt(qtyInput.value);
+        if (this.dataset.action === 'plus') {
+          qtyInput.value = val + 1;
+        } else if (val > 1) {
+          qtyInput.value = val - 1;
+        }
       });
-      qtyInc.addEventListener('click', function() {
-        qtyInput.value = parseInt(qtyInput.value || 1) + 1;
-      });
-    }
-  })();
+    });
+  });
 </script>
 
 {% schema %}
 {
-  "name": "t:general.product",
+  "name": "Professional Product Page",
   "settings": [
-    {
-      "type": "header",
-      "content": "t:general.colors"
-    },
     {
       "type": "color",
       "id": "accent_color",
-      "label": "t:labels.accent_color",
+      "label": "Accent Color",
       "default": "#c49a5e"
     }
   ],
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
   "presets": [
     {
-      "name": "Product Page"
+      "name": "Professional Product Page"
     }
   ]
 }
