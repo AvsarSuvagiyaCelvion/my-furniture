@@ -39,7 +39,7 @@
         "bg_color": "#111111",
         "text_color": "#ffffff",
         "accent_color": "#c49a5e",
-        "show_gradient": false,
+        "show_gradient": true,
         "font_size": 20,
         "speed": 30
       }
