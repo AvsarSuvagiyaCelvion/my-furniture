@@ -1,3 +1,9 @@
+{%- if section.settings.sticky_header -%}
+  <style>
+    body { padding-top: 72px; }
+  </style>
+{%- endif -%}
+
 <header
   class="header{% if section.settings.sticky_header %} header--sticky{% endif %}"
   id="shopify-section-header"
@@ -236,8 +242,11 @@
   }
 
   .header--sticky {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
   }
 
   .header--scrolled {

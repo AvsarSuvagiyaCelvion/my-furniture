@@ -1,0 +1,274 @@
+{%- assign collection = collections[section.settings.collection] -%}
+{%- assign limit = 6 -%}
+
+<section class="featured-products-slider section-{{ section.id }}">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="title">{{ section.settings.title }}</h2>
+      <p class="subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <!-- Swiper Slider Container -->
+    <div class="swiper featured-products-swiper">
+      <div class="swiper-wrapper">
+        {% for product in collection.products limit: limit %}
+          <div class="swiper-slide">
+            <div class="product-card">
+              <a href="{{ product.url }}" class="product-link">
+                <div class="product-image-box">
+                  {% if product.available == false %}
+                    <span class="badge sold-out">Sold Out</span>
+                  {% endif %}
+                  {% if product.compare_at_price > product.price %}
+                    <span class="badge sale">Sale</span>
+                  {% endif %}
+
+                  <img
+                    class="primary-img"
+                    src="{{ product.featured_image | img_url: '600x' }}"
+                    alt="{{ product.title }}"
+                    loading="lazy"
+                  >
+                  {% if product.images.size > 1 %}
+                    <img
+                      class="secondary-img"
+                      src="{{ product.images[1] | img_url: '600x' }}"
+                      alt="{{ product.title }}"
+                      loading="lazy"
+                    >
+                  {% endif %}
+
+                  <div class="quick-add">
+                    <span>+ Quick View</span>
+                  </div>
+                </div>
+
+                <div class="product-info">
+                  <h3 class="product-title">{{ product.title }}</h3>
+                  <div class="product-price">
+                    <span class="current-price">{{ product.price | money }}</span>
+                    {% if product.compare_at_price > product.price %}
+                      <span class="old-price">{{ product.compare_at_price | money }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        {% else %}
+          {% for i in (1..6) %}
+            <div class="swiper-slide">
+              <div class="product-card">
+                {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+                <p>Product Title {{ i }}</p>
+                <p>{{ 1999 | money }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+
+      <!-- Navigation Arrows -->
+      <div class="swiper-button-next custom-nav"></div>
+      <div class="swiper-button-prev custom-nav"></div>
+      <!-- Pagination dots -->
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Include Swiper.js & CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<style>
+  .featured-products-slider {
+    padding: 80px 0;
+    background: #fff;
+    overflow: hidden;
+  }
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  .section-header .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #222;
+  }
+  .section-header .subtitle {
+    color: #777;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .product-card {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .product-image-box {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.6s ease;
+  }
+  .secondary-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+  }
+
+  .product-card:hover .secondary-img {
+    opacity: 1;
+  }
+  .product-card:hover .primary-img {
+    transform: scale(1.1);
+  }
+
+  /* Quick View Button */
+  .quick-add {
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    text-align: center;
+    transition: 0.4s;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+  .product-card:hover .quick-add {
+    bottom: 0;
+  }
+
+  .product-info {
+    padding: 20px 0;
+    text-align: left;
+  }
+  .product-title {
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .product-price {
+    font-size: 1rem;
+    color: #222;
+  }
+  .old-price {
+    text-decoration: line-through;
+    color: #999;
+    margin-left: 10px;
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 5px 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    z-index: 2;
+    border-radius: 20px;
+    color: #fff;
+  }
+  .sale {
+    background: #e74c3c;
+  }
+  .sold-out {
+    background: #222;
+  }
+
+  /* Navigation Styling */
+  .custom-nav {
+    color: #222 !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .custom-nav::after {
+    font-size: 1rem !important;
+    font-weight: bold;
+  }
+
+  .swiper-pagination-bullet-active {
+    background: #222 !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    new Swiper('.featured-products-swiper', {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      breakpoints: {
+        640: { slidesPerView: 2 },
+        1024: { slidesPerView: 3 },
+        1200: { slidesPerView: 4 },
+      },
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Featured Products Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "New Arrivals"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subheading",
+      "default": "Minimalist Furniture Collection"
+    },
+    {
+      "id": "collection",
+      "type": "collection",
+      "label": "Select Collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products Slider"
+    }
+  ]
+}
+{% endschema %}
