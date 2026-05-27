@@ -24,6 +24,8 @@
     "custom_section": "Custom section",
     "fonts": "Fonts",
     "footer": "Footer",
+    "trust_signals": "Trust signals",
+    "policy_links": "Policy links",
     "group": "Group",
     "brand": "Brand",
     "header": "Header",
@@ -36,6 +38,8 @@
     "style": "Style",
     "why_choose_us": "Why choose us",
     "image": "Image",
+    "customer_reviews": "Customer reviews",
+    "review": "Review",
     "social_proof": "Social proof",
     "split_hero": "Split hero",
     "layout": "Layout",
@@ -114,6 +118,10 @@
     "page_margin": "Page margin",
     "page_width": "Page width",
     "show_payment_icons": "Show payment icons",
+    "show_trust_badges": "Show trust badges",
+    "policy_menu": "Policy links menu",
+    "footer_bg_color": "Footer background color",
+    "footer_text_color": "Footer text color",
     "text_style": "Text style",
     "text": "Text",
     "columns_desktop": "Desktop columns",
@@ -122,7 +130,15 @@
     "show_vendor": "Show vendor",
     "show_collection_image": "Show collection banner",
     "show_secondary_image": "Show hover image",
-    "enable_quick_add": "Enable quick add"
+    "author_avatar": "Author avatar",
+    "author_name": "Author name",
+    "author_title": "Author title / location",
+    "enable_quick_add": "Enable quick add",
+    "show_product_count": "Show product count",
+    "product_name": "Product reviewed",
+    "rating": "Star rating",
+    "review_text": "Review text",
+    "verified": "Show verified badge"
   },
   "options": {
     "alignment": {
@@ -169,6 +185,12 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
-    },
+    }
+  },
+  "sections": {
+    "customer_reviews": {
+      "accent_info": "Used for decorative accents. Text uses an auto-darkened variant for WCAG AA contrast.",
+      "heading_default": "What Our Customers Say"
+    }
   }
 }

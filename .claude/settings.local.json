@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(shopify theme *)"
+      "Bash(shopify theme *)",
+      "Bash(dir sections\\\\customer-reviews.liquid)",
+      "Bash(dir assets\\\\critical.css)",
+      "Bash(Test-Path *)"
     ]
   }
 }

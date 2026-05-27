@@ -9,7 +9,8 @@
  */
 {
   "general": {
-    "home": "Home"
+    "home": "Home",
+    "skip_to_content": "Skip to content"
   },
   "collection": {
     "sort_by": "Sort by",
@@ -19,7 +20,8 @@
     "choose_options": "Choose options",
     "from": "From",
     "no_products": "No products found.",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "shop_now": "Shop now"
   },
   "header": {
     "navigation": "Navigation",
@@ -79,7 +81,15 @@
     "social_instagram": "Follow us on Instagram",
     "social_facebook": "Follow us on Facebook",
     "social_pinterest": "Follow us on Pinterest",
-    "social_x": "Follow us on X"
+    "social_x": "Follow us on X",
+    "trust_shipping": "Free Delivery",
+    "trust_shipping_detail": "On orders over $150",
+    "trust_returns": "Easy Returns",
+    "trust_returns_detail": "30-day hassle-free",
+    "trust_quality": "Crafted with Care",
+    "trust_quality_detail": "Built to last generations",
+    "trust_eco": "Sustainably Made",
+    "trust_eco_detail": "Responsibly sourced materials"
   },
   "search": {
     "title": "Search",
@@ -87,5 +97,12 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "sections": {
+    "customer_reviews": {
+      "out_of_5": "out of 5 stars",
+      "verified": "Verified",
+      "verified_buyer": "Verified buyer badge"
+    }
   }
 }

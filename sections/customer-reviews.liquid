@@ -1,0 +1,665 @@
+{% comment %}
+  Section: customer-reviews
+  Purpose: Display customer testimonials with star ratings in a responsive card grid
+  Used in: Homepage, collection pages, landing pages — anywhere social proof is needed
+  Metafield dependencies: none
+{% endcomment %}
+
+{%- liquid
+  assign heading    = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign accent     = section.settings.accent_color
+  assign bg         = section.settings.section_background | default: 'warm'
+  assign cols       = section.settings.columns_desktop | default: '3'
+-%}
+
+<section
+  class="cr cr--{{ bg }}"
+  style="--cr-accent: {{ accent }}; --cr-cols: {{ cols }};"
+  data-section-id="{{ section.id }}"
+  data-section-type="customer-reviews"
+>
+  <div class="cr__inner">
+
+    {%- if heading != blank or subheading != blank -%}
+      <header class="cr__header cr__animate">
+        {%- if heading != blank -%}
+          <h2 class="cr__heading">{{ heading | escape }}</h2>
+        {%- endif -%}
+        {%- if subheading != blank -%}
+          <p class="cr__subheading">{{ subheading | escape }}</p>
+        {%- endif -%}
+      </header>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="cr__grid">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+
+            {%- when 'review' -%}
+              {%- assign stars = block.settings.rating | default: 5 -%}
+              <article
+                class="cr__card cr__animate"
+                style="--stagger: {{ forloop.index0 | times: 90 }}ms;"
+                {{ block.shopify_attributes }}
+              >
+                <div class="cr__card-shine" aria-hidden="true"></div>
+
+                <div class="cr__quote" aria-hidden="true">
+                  <svg width="32" height="25" viewBox="0 0 36 28" fill="currentColor">
+                    <path d="M0 28V16.8C0 12.133 1.2 8.267 3.6 5.2C6.067 2.067 9.6.333 14.4.16L15.2 2.8C12.8 3.267 10.8 4.4 9.2 6.2 7.6 7.933 6.8 9.933 6.8 12.2H11.2V28H0ZM20.8 28V16.8C20.8 12.133 22 8.267 24.4 5.2 26.867 2.067 30.4.333 35.2.16L36 2.8C33.6 3.267 31.6 4.4 30 6.2 28.4 7.933 27.6 9.933 27.6 12.2H32V28H20.8Z"/>
+                  </svg>
+                </div>
+
+                <div
+                  class="cr__stars"
+                  role="img"
+                  aria-label="{{ stars }} {{ 'sections.customer_reviews.out_of_5' | t }}"
+                >
+                  {%- for i in (1..5) -%}
+                    <span class="cr__star{% if i <= stars %} cr__star--on{% endif %}" aria-hidden="true">
+                      <svg width="15" height="15" viewBox="0 0 24 24">
+                        <polygon
+                          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"
+                          {%- if i <= stars %} fill="currentColor"{% else %} fill="none"{% endif %}
+                        />
+                      </svg>
+                    </span>
+                  {%- endfor -%}
+                </div>
+
+                <blockquote class="cr__text">
+                  {%- if block.settings.review_text != blank -%}
+                    <p>{{ block.settings.review_text | escape }}</p>
+                  {%- endif -%}
+
+                  <footer class="cr__author">
+                    {%- if block.settings.author_avatar != blank -%}
+                      <div class="cr__avatar cr__avatar--photo">
+                        {{ block.settings.author_avatar
+                          | image_url: width: 80, format: 'webp'
+                          | image_tag:
+                              loading: 'lazy',
+                              width: 40,
+                              height: 40,
+                              alt: block.settings.author_name
+                        }}
+                      </div>
+                    {%- else -%}
+                      <div class="cr__avatar cr__avatar--initials" aria-hidden="true">
+                        {%- assign name_parts = block.settings.author_name | split: ' ' -%}
+                        {%- if name_parts[1] -%}
+                          {{- name_parts[0] | slice: 0 | upcase -}}{{- name_parts[1] | slice: 0 | upcase -}}
+                        {%- else -%}
+                          {{- block.settings.author_name | slice: 0 | upcase -}}
+                        {%- endif -%}
+                      </div>
+                    {%- endif -%}
+
+                    <div class="cr__author-meta">
+                      {%- if block.settings.author_name != blank -%}
+                        <cite class="cr__author-name">{{ block.settings.author_name | escape }}</cite>
+                      {%- endif -%}
+                      {%- if block.settings.author_title != blank -%}
+                        <span class="cr__author-role">{{ block.settings.author_title | escape }}</span>
+                      {%- endif -%}
+                    </div>
+
+                    {%- if block.settings.verified -%}
+                      <span
+                        class="cr__verified"
+                        role="img"
+                        aria-label="{{ 'sections.customer_reviews.verified_buyer' | t }}"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {{ 'sections.customer_reviews.verified' | t }}
+                      </span>
+                    {%- endif -%}
+                  </footer>
+                </blockquote>
+
+                {%- if block.settings.product_name != blank -%}
+                  <div class="cr__product-pill">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                      <circle cx="7" cy="7" r="1" fill="currentColor"/>
+                    </svg>
+                    {{ block.settings.product_name | escape }}
+                  </div>
+                {%- endif -%}
+              </article>
+
+            {%- when '@app' -%}
+              {% render block %}
+
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+{% stylesheet %}
+  @keyframes cr-underline {
+    from { width: 0; }
+    to   { width: 48px; }
+  }
+
+  @keyframes cr-shine {
+    0%   { left: -75%; }
+    100% { left: 125%; }
+  }
+
+  .cr {
+    padding: 3.5rem 0;
+    overflow: hidden;
+    --cr-accent-text: color-mix(in oklch, var(--cr-accent) 55%, black);
+    --cr-accent-gfx:  color-mix(in oklch, var(--cr-accent) 68%, black);
+  }
+
+  .cr--white { background: var(--color-background, #ffffff); }
+  .cr--warm  { background: var(--color-background-2, #faf8f5); }
+  .cr--dark  { background: var(--color-background-dark, #18181a); }
+
+  .cr__inner {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+  }
+
+  .cr *:focus-visible {
+    outline: 2px solid var(--cr-accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  .cr__animate {
+    opacity: 0;
+    transform: translateY(36px);
+    transition:
+      opacity   0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms);
+  }
+
+  .cr__animate.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .cr__header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .cr__heading {
+    font-family: var(--font-primary--family);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.15;
+    color: var(--color-foreground);
+    margin: 0 0 0.75rem;
+    display: inline-block;
+    position: relative;
+  }
+
+  .cr__heading::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 3px;
+    width: 0;
+    border-radius: 2px;
+    background: var(--cr-accent, #c49a5e);
+  }
+
+  .cr__header.is-visible .cr__heading::after {
+    animation: cr-underline 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  .cr__subheading {
+    font-family: var(--font-primary--family);
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #6b6359;
+    margin: 1.25rem auto 0;
+    max-width: 52ch;
+  }
+
+  .cr--dark .cr__heading    { color: #ffffff; }
+  .cr--dark .cr__subheading { color: rgba(255,255,255,0.55); }
+
+  .cr__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .cr         { padding: 4rem 0; }
+    .cr__header { margin-bottom: 2.5rem; }
+    .cr__grid   { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .cr         { padding: 5rem 0; }
+    .cr__header { margin-bottom: 3rem; }
+    .cr__grid   { grid-template-columns: repeat(var(--cr-cols, 3), 1fr); }
+  }
+
+  .cr__card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: 1.5rem 1.25rem 1.25rem;
+    background: var(--color-background, #ffffff);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+    transition:
+      opacity      0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      transform    0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      box-shadow   0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  @media (min-width: 640px) {
+    .cr__card { padding: 2rem 1.75rem 1.5rem; }
+
+    .cr__card.is-visible:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
+      border-color: color-mix(in srgb, var(--cr-accent) 35%, transparent);
+    }
+  }
+
+  .cr--dark .cr__card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .cr--dark .cr__card.is-visible:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: color-mix(in srgb, var(--cr-accent) 45%, transparent);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  }
+
+  .cr__card-shine {
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 60%
+    );
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .cr__card.is-visible:hover .cr__card-shine {
+    opacity: 1;
+    animation: cr-shine 0.5s ease forwards;
+  }
+
+  .cr__quote {
+    color: var(--cr-accent, #c49a5e);
+    opacity: 0.2;
+    line-height: 0;
+    flex-shrink: 0;
+  }
+
+  .cr__stars {
+    display: flex;
+    gap: 0.125rem;
+    align-items: center;
+  }
+
+  .cr__star     { display: flex; color: #a09070; }
+  .cr__star--on { color: var(--cr-accent-gfx); }
+
+  .cr__text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .cr__text p {
+    flex-grow: 1;
+    font-family: var(--font-primary--family);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-foreground);
+    opacity: 0.72;
+    margin: 0 0 0.875rem;
+    font-style: italic;
+  }
+
+  .cr--dark .cr__text p { color: rgba(255,255,255,0.65); opacity: 1; }
+
+  .cr__author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+  }
+
+  .cr--dark .cr__author { border-top-color: rgba(255,255,255,0.07); }
+
+  .cr__avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .cr__avatar--photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cr__avatar--initials {
+    background: var(--cr-accent, #c49a5e);
+    color: #ffffff;
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cr__author-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .cr__author-name {
+    font-family: var(--font-primary--family);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    font-style: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cr--dark .cr__author-name { color: #ffffff; }
+
+  .cr__author-role {
+    font-family: var(--font-primary--family);
+    font-size: 0.75rem;
+    color: #7a7168;
+  }
+
+  .cr--dark .cr__author-role { color: rgba(255,255,255,0.5); }
+
+  .cr__verified {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6875rem;
+    color: var(--cr-accent-text);
+    font-family: var(--font-primary--family);
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .cr__product-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, var(--cr-accent) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cr-accent) 20%, transparent);
+    border-radius: 100px;
+    font-family: var(--font-primary--family);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--cr-accent-text);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    align-self: flex-start;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cr__animate {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .cr__heading::after {
+      animation: none;
+      width: 48px;
+    }
+    .cr__card.is-visible:hover .cr__card-shine {
+      animation: none;
+      opacity: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    function init(container) {
+      var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var targets = container.querySelectorAll('.cr__animate');
+
+      if (reducedMotion || !('IntersectionObserver' in window)) {
+        targets.forEach(function (el) { el.classList.add('is-visible'); });
+        return;
+      }
+
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var el = entry.target;
+            el.classList.add('is-visible');
+            var delay = parseInt(el.style.getPropertyValue('--stagger') || '0', 10);
+            setTimeout(function () {
+              el.style.setProperty('--stagger', '0ms');
+            }, 700 + delay);
+            observer.unobserve(el);
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -30px 0px' }
+      );
+
+      targets.forEach(function (el) { observer.observe(el); });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-section-type="customer-reviews"]').forEach(init);
+      });
+    } else {
+      document.querySelectorAll('[data-section-type="customer-reviews"]').forEach(init);
+    }
+
+    document.addEventListener('shopify:section:load', function (e) {
+      var section = e.target.querySelector('[data-section-type="customer-reviews"]');
+      if (section) init(section);
+    });
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.customer_reviews",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "review",
+      "name": "t:general.review",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "author_avatar",
+          "label": "t:labels.author_avatar"
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "t:labels.author_name",
+          "default": "Sarah M."
+        },
+        {
+          "type": "text",
+          "id": "author_title",
+          "label": "t:labels.author_title",
+          "placeholder": "e.g. Verified Buyer · London"
+        },
+        {
+          "type": "text",
+          "id": "product_name",
+          "label": "t:labels.product_name",
+          "placeholder": "e.g. Oslo Dining Chair"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "t:labels.rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "review_text",
+          "label": "t:labels.review_text",
+          "default": "Absolutely love the quality and craftsmanship. It arrived perfectly packed and looks even better in person."
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "t:labels.verified",
+          "default": true
+        }
+      ]
+    },
+    { "type": "@app" }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "t:sections.customer_reviews.heading_default"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "placeholder": "Join thousands of happy customers"
+    },
+    {
+      "type": "header",
+      "content": "t:general.style"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "t:labels.accent_color",
+      "default": "#c49a5e",
+      "info": "t:sections.customer_reviews.accent_info"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "t:labels.columns_desktop",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "section_background",
+      "label": "t:labels.section_background",
+      "options": [
+        { "value": "white", "label": "t:options.section_bg.white" },
+        { "value": "warm",  "label": "t:options.section_bg.warm" },
+        { "value": "dark",  "label": "t:options.section_bg.dark" }
+      ],
+      "default": "warm"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.customer_reviews",
+      "blocks": [
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "review_text": "Absolutely love the quality and craftsmanship. It arrived perfectly packed and looks even better in person. The wood finish is stunning.",
+            "author_name": "Sarah M.",
+            "author_title": "Verified Buyer · London",
+            "verified": true,
+            "product_name": "Oslo Dining Chair"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "review_text": "This piece transformed our living room. The minimalist design pairs perfectly with everything, and the build quality is exceptional.",
+            "author_name": "James R.",
+            "author_title": "Verified Buyer · Manchester",
+            "verified": true,
+            "product_name": "Bergen Coffee Table"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "review_text": "I've bought from many furniture brands and Minicom stands apart. Delivery was swift, packaging was eco-friendly, and the product is flawless.",
+            "author_name": "Emma K.",
+            "author_title": "Verified Buyer · Edinburgh",
+            "verified": true,
+            "product_name": "Fjord Side Table"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

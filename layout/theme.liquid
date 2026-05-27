@@ -27,9 +27,13 @@
   </head>
 
   <body>
+    <a href="#main-content" class="skip-link">{{ 'general.skip_to_content' | t }}</a>
+
     {% sections 'header-group' %}
 
-    {{ content_for_layout }}
+    <main id="main-content" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
   </body>

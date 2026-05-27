@@ -1,11 +1,89 @@
-<footer class="footer" style="--footer-accent: {{ section.settings.accent_color }};">
+{%- comment -%}
+  sections/footer.liquid
+  Professional dark-ground footer for a premium furniture brand.
+  Four-column grid, trust badges strip, policy links, newsletter.
+{%- endcomment -%}
+
+<footer
+  class="footer"
+  style="--footer-accent:{{ section.settings.accent_color }};--footer-bg:{{ section.settings.footer_bg_color }};--footer-fg:{{ section.settings.footer_text_color }};"
+>
+
+  {%- comment -%} ── Trust Badges Strip ─────────────────────── {%- endcomment -%}
+  {%- if section.settings.show_trust_badges -%}
+    <div class="footer__trust">
+      <div class="footer__trust-inner" role="list" aria-label="Our commitments">
+
+        <div class="footer__trust-item" role="listitem">
+          <span class="footer__trust-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="2"/>
+              <path d="M16 8h4l3 3v5h-7V8z"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/>
+              <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </span>
+          <div>
+            <p class="footer__trust-label">{{ 'footer.trust_shipping' | t }}</p>
+            <p class="footer__trust-detail">{{ 'footer.trust_shipping_detail' | t }}</p>
+          </div>
+        </div>
+
+        <div class="footer__trust-divider" aria-hidden="true"></div>
+
+        <div class="footer__trust-item" role="listitem">
+          <span class="footer__trust-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+            </svg>
+          </span>
+          <div>
+            <p class="footer__trust-label">{{ 'footer.trust_returns' | t }}</p>
+            <p class="footer__trust-detail">{{ 'footer.trust_returns_detail' | t }}</p>
+          </div>
+        </div>
+
+        <div class="footer__trust-divider" aria-hidden="true"></div>
+
+        <div class="footer__trust-item" role="listitem">
+          <span class="footer__trust-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="footer__trust-label">{{ 'footer.trust_quality' | t }}</p>
+            <p class="footer__trust-detail">{{ 'footer.trust_quality_detail' | t }}</p>
+          </div>
+        </div>
+
+        <div class="footer__trust-divider" aria-hidden="true"></div>
+
+        <div class="footer__trust-item" role="listitem">
+          <span class="footer__trust-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 8C8 10 5.9 16.17 3.82 19.49a4.56 4.56 0 0 0 7.62 4.79"/>
+              <path d="M12 2a5 5 0 0 1 5 5c0 6.24-8 13-8 13"/>
+            </svg>
+          </span>
+          <div>
+            <p class="footer__trust-label">{{ 'footer.trust_eco' | t }}</p>
+            <p class="footer__trust-detail">{{ 'footer.trust_eco_detail' | t }}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ── Main Grid ──────────────────────────────── {%- endcomment -%}
   <div class="footer__main">
     <div class="footer__inner">
 
       {%- comment -%} Brand Column {%- endcomment -%}
       <div class="footer__brand">
-        {%- if section.
-          s.logo != blank -%}
+        {%- if section.settings.logo != blank -%}
           <a href="{{ routes.root_url }}" class="footer__logo-link" aria-label="{{ shop.name }}">
             {{- section.settings.logo
               | image_url: width: section.settings.logo_max_width, format: 'webp'
@@ -35,7 +113,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
               </svg>
             </a>
@@ -49,7 +127,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
@@ -63,7 +141,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
               </svg>
             </a>
@@ -77,7 +155,7 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
@@ -138,7 +216,7 @@
           {%- endif -%}
           {%- form 'customer' -%}
             {%- if form.posted_successfully? -%}
-              <p class="footer__newsletter-success">{{ 'footer.newsletter_success' | t }}</p>
+              <p class="footer__newsletter-success" role="status">{{ 'footer.newsletter_success' | t }}</p>
             {%- else -%}
               <input type="hidden" name="contact[tags]" value="newsletter">
               <div class="footer__newsletter-form">
@@ -153,13 +231,13 @@
                 >
                 <button type="submit" class="footer__newsletter-btn">
                   <span>{{ 'footer.newsletter_submit' | t }}</span>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </button>
               </div>
               {%- if form.errors -%}
-                <p class="footer__newsletter-error">{{ form.errors | default_errors }}</p>
+                <p class="footer__newsletter-error" role="alert">{{ form.errors | default_errors }}</p>
               {%- endif -%}
             {%- endif -%}
           {%- endform -%}
@@ -169,430 +247,578 @@
     </div>
   </div>
 
-  {%- comment -%} Bottom Bar {%- endcomment -%}
+  {%- comment -%} ── Bottom Bar ─────────────────────────────── {%- endcomment -%}
   <div class="footer__bottom">
     <div class="footer__bottom-inner">
+
       <p class="footer__copyright">
         &copy; {{ 'now' | date: '%Y' }}
         <a href="{{ routes.root_url }}" class="footer__copyright-link">{{ shop.name }}</a>
-        &mdash; {{ powered_by_link }}
       </p>
 
+      {%- if section.settings.policy_menu != blank -%}
+        <nav class="footer__policy-nav" aria-label="Legal links">
+          {%- for link in section.settings.policy_menu.links -%}
+            <a href="{{ link.url }}" class="footer__policy-link">{{ link.title }}</a>
+          {%- endfor -%}
+        </nav>
+      {%- endif -%}
+
       {%- if section.settings.show_payment_icons -%}
-        <div class="footer__payment">
+        <div class="footer__payment" aria-label="Accepted payment methods">
           {%- for type in shop.enabled_payment_types -%}
             {{ type | payment_type_svg_tag }}
           {%- endfor -%}
         </div>
       {%- endif -%}
+
     </div>
   </div>
+
 </footer>
 
 {% stylesheet %}
-  /* ── Footer Shell ──────────────────────────────────── */
-  .footer {
-    margin-top: 5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.09);
-    background: var(--color-background);
-  }
+/* ══════════════════════════════════════════════════
+   Footer — Professional dark-ground design
+   Warm charcoal bg, gold accents, trust badges.
+   ══════════════════════════════════════════════════ */
 
-  /* ── Main Content ──────────────────────────────────── */
-  .footer__main {
-    padding: 4rem 0 3rem;
-  }
+/* ── CSS Custom Properties & Shell ─────────────── */
+.footer {
+  /* Defaults — overridden by inline style from schema color pickers */
+  --footer-bg:     #1c1a17;
+  --footer-fg:     #f0ebe3;
+  --footer-muted:  rgba(240, 235, 227, 0.50);
+  --footer-border: rgba(240, 235, 227, 0.09);
+  --footer-accent: #c49a5e;
 
-  .footer__inner {
-    max-width: var(--page-width);
-    margin: 0 auto;
-    padding: 0 var(--page-margin);
-    display: flex;
-    flex-direction: column;
+  background: var(--footer-bg);
+  color: var(--footer-fg);
+  margin-top: 5rem;
+}
+
+/* Thin gold gradient bar at very top of footer */
+.footer::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--footer-accent) 25%,
+    var(--footer-accent) 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+}
+
+/* ── Trust Badges Strip ────────────────────────── */
+.footer__trust {
+  border-bottom: 1px solid var(--footer-border);
+  padding: 2rem 0;
+}
+
+.footer__trust-inner {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 var(--page-margin);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .footer__trust-inner {
+    /* 4 items + 3 dividers alternating */
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
     gap: 0;
+    align-items: center;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__inner {
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 3rem;
-    }
+.footer__trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.footer__trust-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(196, 154, 94, 0.28);
+  border-radius: 50%;
+  color: var(--footer-accent);
+}
+
+.footer__trust-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--footer-fg);
+  margin: 0 0 0.1875rem;
+  line-height: 1.3;
+}
+
+.footer__trust-detail {
+  font-size: 0.75rem;
+  color: var(--footer-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Dividers — hidden on mobile, vertical lines on desktop */
+.footer__trust-divider {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .footer__trust-divider {
+    display: block;
+    width: 1px;
+    height: 2.75rem;
+    background: var(--footer-border);
+    margin: 0 2rem;
   }
+}
 
-  /* ── Brand Column ──────────────────────────────────── */
+/* ── Main Grid ─────────────────────────────────── */
+.footer__main {
+  padding: 4.5rem 0 3.5rem;
+}
+
+.footer__inner {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 0 var(--page-margin);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .footer__inner {
+    grid-template-columns: 1.25fr 1fr 1fr 1.35fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+
+/* ── Brand Column ──────────────────────────────── */
+.footer__brand {
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--footer-border);
+}
+
+@media (min-width: 768px) {
   .footer__brand {
-    padding-bottom: 2rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 0;
+    border-bottom: none;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__brand {
-      flex: 0 0 210px;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-  }
+.footer__logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--footer-fg);
+  margin-bottom: 1.125rem;
+  transition: opacity 0.2s ease;
+}
 
-  .footer__logo-link {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--color-foreground);
-    margin-bottom: 1rem;
-    transition: color 0.2s ease, opacity 0.2s ease;
-  }
+.footer__logo-link:hover {
+  opacity: 0.75;
+}
 
-  .footer__logo-link:hover {
-    color: var(--footer-accent, #c49a5e);
-    opacity: 0.9;
-  }
+.footer__logo-img {
+  display: block;
+  height: auto;
+  max-height: 44px;
+  width: auto;
+}
 
-  .footer__logo-img {
-    display: block;
-    height: auto;
-    max-height: 40px;
-    width: auto;
-  }
+.footer__logo-wordmark {
+  font-family: var(--font-primary--family);
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--footer-fg);
+}
 
-  .footer__logo-wordmark {
-    font-family: var(--font-primary--family);
-    font-size: 1.25rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: inherit;
-  }
+.footer__tagline {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--footer-muted);
+  margin: 0 0 1.5rem;
+  max-width: 24ch;
+}
 
-  .footer__tagline {
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--color-foreground);
-    opacity: 0.6;
-    margin: 0 0 1.25rem;
-    max-width: 22ch;
-  }
+/* Social icons */
+.footer__social {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
-  /* Social links */
-  .footer__social {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-  }
+.footer__social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--footer-border);
+  border-radius: 50%;
+  color: var(--footer-fg);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
 
+@media (prefers-reduced-motion: no-preference) {
   .footer__social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    color: var(--color-foreground);
-    text-decoration: none;
-    opacity: 0.7;
-    transition: background 0.2s ease, color 0.2s ease,
-                opacity 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s ease, color 0.2s ease,
+                opacity 0.2s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+}
 
-  .footer__social-link:hover {
-    opacity: 1;
-    color: #fff;
-    background: var(--footer-accent, #c49a5e);
-    transform: translateY(-3px);
-  }
+.footer__social-link:hover,
+.footer__social-link:focus-visible {
+  border-color: var(--footer-accent);
+  color: var(--footer-accent);
+  opacity: 1;
+  transform: translateY(-3px);
+}
 
-  .footer__social-link svg {
-    display: block;
-    flex-shrink: 0;
-  }
+.footer__social-link svg {
+  display: block;
+  flex-shrink: 0;
+}
 
-  /* ── Nav Columns ───────────────────────────────────── */
+/* ── Nav Columns ───────────────────────────────── */
+.footer__col {
+  border-bottom: 1px solid var(--footer-border);
+}
+
+@media (min-width: 768px) {
   .footer__col {
-    flex: 1;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: none;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__col {
-      border-bottom: none;
-    }
-  }
+.footer__col-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  padding: 1.125rem 0;
+  cursor: pointer;
+  color: var(--footer-fg);
+  text-align: left;
+}
 
+@media (min-width: 768px) {
   .footer__col-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: none;
-    border: none;
-    padding: 1rem 0;
-    cursor: pointer;
-    color: var(--color-foreground);
-    text-align: left;
+    pointer-events: none;
+    cursor: default;
+    padding: 0 0 1.125rem;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__col-toggle {
-      pointer-events: none;
-      cursor: default;
-      padding: 0 0 1rem;
-    }
-  }
+.footer__col-heading-text {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--footer-accent);
+}
 
-  .footer__col-heading-text {
-    font-family: var(--font-primary--family);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-foreground);
-  }
+.footer__col-heading-empty {
+  height: calc(0.6875rem * 1.5 + 1.125rem);
+  display: none;
+}
 
+@media (min-width: 768px) {
   .footer__col-heading-empty {
-    height: calc(0.75rem * 1.5 + 1rem);
-    display: none;
+    display: block;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__col-heading-empty {
-      display: block;
-    }
-  }
+.footer__col-chevron {
+  flex-shrink: 0;
+  color: var(--footer-muted);
+  transition: transform 0.22s ease;
+}
 
+@media (min-width: 768px) {
   .footer__col-chevron {
-    flex-shrink: 0;
-    transition: transform 0.22s ease;
-    opacity: 0.5;
-  }
-
-  @media (min-width: 768px) {
-    .footer__col-chevron {
-      display: none;
-    }
-  }
-
-  .footer__col-toggle[aria-expanded="true"] .footer__col-chevron {
-    transform: rotate(180deg);
-    color: var(--footer-accent, #c49a5e);
-    opacity: 1;
-  }
-
-  /* Nav list */
-  .footer__nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
-  .footer__nav-list[hidden] {
     display: none;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__nav-list[hidden] {
-      display: flex;
-    }
-    .footer__nav-list {
-      padding: 0;
-    }
+.footer__col-toggle[aria-expanded="true"] .footer__col-chevron {
+  transform: rotate(180deg);
+  color: var(--footer-accent);
+}
+
+/* Nav list */
+.footer__nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0 1.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.footer__nav-list[hidden] {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .footer__nav-list[hidden] {
+    display: flex;
   }
-
-  .footer__nav-link {
-    position: relative;
-    display: inline-block;
-    padding: 0.3125rem 0;
-    font-family: var(--font-primary--family);
-    font-size: 0.9rem;
-    text-decoration: none;
-    color: var(--color-foreground);
-    opacity: 0.65;
-    transition: opacity 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  .footer__nav-list {
+    padding: 0;
   }
+}
 
-  /* Accent underline that slides in */
-  .footer__nav-link::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0.1rem;
-    width: 100%;
-    height: 1.5px;
-    background: var(--footer-accent, #c49a5e);
-    border-radius: 2px;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  }
+/* Side-rule reveal on hover */
+.footer__nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0.4375rem 0;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--footer-muted);
+  line-height: 1.4;
+  transition: color 0.18s ease, padding-left 0.2s ease;
+}
 
-  .footer__nav-link:hover {
-    opacity: 1;
-    color: var(--footer-accent, #c49a5e);
-    transform: translateX(3px);
-  }
+.footer__nav-link::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 1px;
+  background: var(--footer-accent);
+  margin-right: 0;
+  flex-shrink: 0;
+  position: relative;
+  top: 0.05em;
+  transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+              margin-right 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-  .footer__nav-link:hover::after {
-    transform: scaleX(1);
-  }
+.footer__nav-link:hover,
+.footer__nav-link:focus-visible {
+  color: var(--footer-fg);
+  padding-left: 0;
+}
 
-  /* ── Newsletter ─────────────────────────────────────── */
+.footer__nav-link:hover::before,
+.footer__nav-link:focus-visible::before {
+  width: 12px;
+  margin-right: 0.5rem;
+}
+
+/* ── Newsletter Column ──────────────────────────── */
+.footer__newsletter {
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--footer-border);
+}
+
+@media (min-width: 768px) {
   .footer__newsletter {
-    padding: 2rem 0 0;
+    padding-top: 0;
+    border-top: none;
   }
+}
 
-  @media (min-width: 768px) {
-    .footer__newsletter {
-      flex: 0 0 260px;
-      padding: 0;
-    }
-  }
+.footer__newsletter-heading {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--footer-accent);
+  margin: 0 0 0.625rem;
+}
 
-  .footer__newsletter-heading {
-    font-family: var(--font-primary--family);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--footer-accent, #c49a5e);
-    margin: 0 0 0.625rem;
-  }
+.footer__newsletter-subtext {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--footer-muted);
+  margin: 0 0 1.375rem;
+}
 
-  .footer__newsletter-subtext {
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--color-foreground);
-    opacity: 0.6;
-    margin: 0 0 1.125rem;
-  }
+.footer__newsletter-form {
+  display: flex;
+  border: 1px solid var(--footer-border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-  .footer__newsletter-form {
-    display: flex;
-    border: 1.5px solid rgba(0, 0, 0, 0.2);
-    border-radius: 999px;
-    overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
+.footer__newsletter-form:focus-within {
+  border-color: var(--footer-accent);
+  box-shadow: 0 0 0 3px rgba(196, 154, 94, 0.15);
+}
 
-  .footer__newsletter-form:focus-within {
-    border-color: var(--footer-accent, #c49a5e);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--footer-accent, #c49a5e) 14%, transparent);
-  }
+.footer__newsletter-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  padding: 0.75rem 0.25rem 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--footer-fg);
+  outline: none;
+}
 
-  .footer__newsletter-input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    background: none;
-    padding: 0.7rem 0.3rem 0.7rem 1.1rem;
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    color: var(--color-foreground);
-    outline: none;
-  }
+.footer__newsletter-input::placeholder {
+  color: var(--footer-muted);
+}
 
-  .footer__newsletter-input::placeholder {
-    color: rgba(0, 0, 0, 0.35);
-  }
+.footer__newsletter-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 4px;
+  padding: 0.5625rem 1.125rem;
+  background: var(--footer-accent);
+  color: #1a1814;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  transition: filter 0.18s ease;
+}
 
-  .footer__newsletter-btn {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    margin: 3px;
-    padding: 0.55rem 1.1rem;
-    background: var(--footer-accent, #c49a5e);
-    color: #fff;
-    border: none;
-    border-radius: 999px;
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: filter 0.18s ease, box-shadow 0.18s ease;
-  }
+.footer__newsletter-btn:hover {
+  filter: brightness(1.1);
+}
 
-  .footer__newsletter-btn:hover {
-    filter: brightness(1.08);
-    box-shadow: 0 6px 16px color-mix(in srgb, var(--footer-accent, #c49a5e) 45%, transparent);
-  }
-
+@media (prefers-reduced-motion: no-preference) {
   .footer__newsletter-btn svg {
     transition: transform 0.2s ease;
   }
-
   .footer__newsletter-btn:hover svg {
     transform: translateX(3px);
   }
+}
 
-  .footer__newsletter-success {
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--footer-accent, #c49a5e);
-    padding: 0.625rem 0;
-  }
+.footer__newsletter-success {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--footer-accent);
+  padding: 0.625rem 0;
+}
 
-  .footer__newsletter-error {
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    color: #c0392b;
-    margin: 0.5rem 0 0;
-  }
+.footer__newsletter-error {
+  font-size: 0.8125rem;
+  color: #f08080;
+  margin: 0.5rem 0 0;
+}
 
-  /* ── Bottom Bar ─────────────────────────────────────── */
-  .footer__bottom {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 1.25rem 0;
-  }
+/* ── Bottom Bar ─────────────────────────────────── */
+.footer__bottom {
+  border-top: 1px solid var(--footer-border);
+}
 
-  .footer__bottom-inner {
-    max-width: var(--page-width);
-    margin: 0 auto;
-    padding: 0 var(--page-margin);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
+.footer__bottom-inner {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 1.375rem var(--page-margin);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
 
-  .footer__copyright {
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    color: var(--color-foreground);
-    opacity: 0.55;
-    margin: 0;
-  }
+.footer__copyright {
+  font-size: 0.8125rem;
+  color: var(--footer-muted);
+  margin: 0;
+  white-space: nowrap;
+}
 
-  .footer__copyright-link {
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.18s ease;
-  }
+.footer__copyright-link {
+  color: var(--footer-fg);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.18s ease;
+}
 
-  .footer__copyright-link:hover {
-    color: var(--footer-accent, #c49a5e);
-    opacity: 1;
-  }
+.footer__copyright-link:hover {
+  opacity: 1;
+  color: var(--footer-accent);
+}
 
-  /* Payment icons */
-  .footer__payment {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-  }
+/* Policy nav */
+.footer__policy-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
 
-  .footer__payment svg {
-    height: 22px;
-    width: auto;
-    border-radius: 3px;
-  }
+.footer__policy-link {
+  font-size: 0.8125rem;
+  color: var(--footer-muted);
+  text-decoration: none;
+  padding: 0.25rem 0.75rem;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+  border-right: 1px solid var(--footer-border);
+}
+
+.footer__policy-link:last-child {
+  border-right: none;
+}
+
+.footer__policy-link:first-child {
+  padding-left: 0;
+}
+
+.footer__policy-link:hover,
+.footer__policy-link:focus-visible {
+  color: var(--footer-fg);
+}
+
+/* Payment icons */
+.footer__payment {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.footer__payment svg {
+  height: 24px;
+  width: auto;
+  border-radius: 4px;
+}
+
+/* ── Focus styles (WCAG 2.2 AA) ─────────────────── */
+.footer a:focus-visible,
+.footer button:focus-visible {
+  outline: 2px solid var(--footer-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
 {% endstylesheet %}
 
 {% javascript %}
@@ -609,7 +835,6 @@
       var list = btn.closest('.footer__col').querySelector('.footer__nav-list');
       if (!list) return;
 
-      // Collapse on mobile by default
       if (isMobile()) {
         list.hidden = true;
         btn.setAttribute('aria-expanded', 'false');
@@ -623,7 +848,6 @@
       });
     });
 
-    // Ensure lists visible when resizing to desktop
     window.addEventListener('resize', function () {
       toggles.forEach(function (btn) {
         var list = btn.closest('.footer__col').querySelector('.footer__nav-list');
@@ -717,6 +941,11 @@
       "label": "t:labels.footer_menu_2"
     },
     {
+      "type": "link_list",
+      "id": "policy_menu",
+      "label": "t:labels.policy_menu"
+    },
+    {
       "type": "header",
       "content": "t:general.newsletter"
     },
@@ -740,6 +969,16 @@
     },
     {
       "type": "header",
+      "content": "t:general.trust_signals"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "t:labels.show_trust_badges",
+      "default": true
+    },
+    {
+      "type": "header",
       "content": "t:general.payment"
     },
     {
@@ -748,16 +987,28 @@
       "label": "t:labels.show_payment_icons",
       "default": true
     },
-{
-  "type": "header",
-  "content": "t:general.colors"
-},
-{
-  "type": "color",
-  "id": "accent_color",
-  "label": "t:labels.accent_color",
-  "default": "#c49a5e"
-}
+    {
+      "type": "header",
+      "content": "t:general.colors"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg_color",
+      "label": "t:labels.footer_bg_color",
+      "default": "#1c1a17"
+    },
+    {
+      "type": "color",
+      "id": "footer_text_color",
+      "label": "t:labels.footer_text_color",
+      "default": "#f0ebe3"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "t:labels.accent_color",
+      "default": "#c49a5e"
+    }
   ]
 }
 {% endschema %}

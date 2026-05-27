@@ -1,5 +1,23 @@
 /** Critical CSS for the theme. This file is included on every page. */
 
+/* Skip link — keyboard users bypass repeated navigation (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-background, #fff);
+  color: var(--color-foreground, #18181a);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border: 2px solid var(--color-foreground, #18181a);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 1rem; }
+
 /* Reset styles inspired by https://www.joshwcomeau.com/css/custom-css-reset/ */
 * {
   box-sizing: border-box;

@@ -1,263 +1,90 @@
-{%- paginate collection.products by section.settings.products_per_page -%}
+{%- comment -%} ── Collections Listing ────────────────────── {%- endcomment -%}
 
-{%- comment -%} ── Collection Hero ────────────────────────── {%- endcomment -%}
-<div class="coll-hero{% unless section.settings.show_collection_image and collection.image != blank %} coll-hero--plain{% endunless %}">
-  {%- if section.settings.show_collection_image and collection.image != blank -%}
-    {{- collection.image
-      | image_url: width: 1800, format: 'webp'
-      | image_tag:
-        class: 'coll-hero__img',
-        alt: collection.title,
-        loading: 'eager'
-    -}}
-    <div class="coll-hero__overlay"></div>
-  {%- endif -%}
-
+{%- comment -%} ── Page header ── {%- endcomment -%}
+<div class="coll-hero coll-hero--plain">
   <div class="coll-hero__content">
     <nav class="coll-hero__breadcrumb" aria-label="{{ 'collection.breadcrumb' | t }}">
       <a href="{{ routes.root_url }}" class="coll-hero__breadcrumb-link">{{ 'general.home' | t }}</a>
       <span aria-hidden="true"> / </span>
-      <span aria-current="page">{{ collection.title }}</span>
+      <span aria-current="page">{{ 'collections.title' | t }}</span>
     </nav>
-    <h1 class="coll-hero__title">{{ collection.title }}</h1>
-    {%- if collection.description != blank -%}
-      <p class="coll-hero__desc">{{ collection.description | strip_html | truncate: 160 }}</p>
+    <h1 class="coll-hero__title">{{ 'collections.title' | t }}</h1>
+    {%- if section.settings.subheading != blank -%}
+      <p class="coll-hero__desc">{{ section.settings.subheading }}</p>
     {%- endif -%}
   </div>
 </div>
 
-{%- comment -%} ── Main content ───────────────────────────── {%- endcomment -%}
+{%- comment -%} ── Collections grid ── {%- endcomment -%}
 <div class="coll-main">
-
-  {%- comment -%} Toolbar {%- endcomment -%}
-  <div class="coll-toolbar">
-    <p class="coll-toolbar__count">
-      {{ 'collection.products_count' | t: count: collection.products_count }}
-    </p>
-
-    <div class="coll-toolbar__sort">
-      <label for="coll-sort" class="coll-toolbar__sort-label">
-        {{ 'collection.sort_by' | t }}
-      </label>
-      <div class="coll-toolbar__select-wrap">
-        <select
-          id="coll-sort"
-          class="coll-toolbar__select"
-          aria-label="{{ 'collection.sort_by' | t }}"
-          onchange="window.location.assign(this.value)"
-        >
-          {%- for option in collection.sort_options -%}
-            <option
-              value="{{ collection.url }}?sort_by={{ option.value }}"
-              {%- if collection.sort_by == option.value %} selected{%- endif -%}
-            >
-              {{ option.name }}
-            </option>
-          {%- endfor -%}
-        </select>
-        <svg class="coll-toolbar__select-icon" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
-          <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  {%- comment -%} Product grid {%- endcomment -%}
-  {%- if collection.products.size > 0 -%}
-    <div
-      class="coll-grid"
-      style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
-    >
-      {%- for product in collection.products -%}
-        {%- liquid
-          assign stagger = forloop.index0 | modulo: section.settings.columns_desktop | times: 90
-          assign is_sale = false
-          if product.compare_at_price > product.price and product.available
-            assign is_sale = true
-            assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
-          endif
-          if forloop.index <= 4
-            assign img_load = 'eager'
-          else
-            assign img_load = 'lazy'
-          endif
-        -%}
-
+  <div
+    class="coll-grid"
+    style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
+  >
+    {%- for coll in collections -%}
+      {%- unless coll.handle == 'frontpage' -%}
+        {%- assign stagger = forloop.index0 | modulo: 4 | times: 100 -%}
         <div class="coll-card coll-card--reveal" style="--stagger: {{ stagger }}ms;">
+          <a href="{{ coll.url }}" class="coll-card__link" aria-label="{{ coll.title }}">
 
-          {%- comment -%} Card media {%- endcomment -%}
-          <div class="coll-card__media">
-            <a href="{{ product.url }}" class="coll-card__img-link" tabindex="-1" aria-hidden="true">
-
-              {%- if product.featured_image != blank -%}
-                {{- product.featured_image
+            <div class="coll-card__media">
+              {%- if coll.image != blank -%}
+                {%- assign img_alt = coll.image.alt | default: coll.title | escape -%}
+                {{-
+                  coll.image
                   | image_url: width: 800, format: 'webp'
                   | image_tag:
-                    class: 'coll-card__img coll-card__img--primary',
-                    alt: product.featured_image.alt | default: product.title,
-                    loading: img_load,
-                    width: product.featured_image.width,
-                    height: product.featured_image.height
-                -}}
-              {%- else -%}
-                {{ 'product-1' | placeholder_svg_tag: 'coll-card__img coll-card__img--placeholder' }}
-              {%- endif -%}
-
-              {%- if section.settings.show_secondary_image and product.images.size > 1 -%}
-                {{- product.images[1]
-                  | image_url: width: 800, format: 'webp'
-                  | image_tag:
-                    class: 'coll-card__img coll-card__img--secondary',
-                    alt: product.images[1].alt | default: product.title,
+                    class: 'coll-card__img',
+                    alt: img_alt,
                     loading: 'lazy',
-                    width: product.images[1].width,
-                    height: product.images[1].height
+                    widths: '400, 600, 800'
                 -}}
-              {%- endif -%}
-
-              {%- comment -%} Badges {%- endcomment -%}
-              <div class="coll-card__badges">
-                {%- if is_sale -%}
-                  <span class="coll-card__badge coll-card__badge--sale">-{{ discount }}%</span>
-                {%- elsif product.available == false -%}
-                  <span class="coll-card__badge coll-card__badge--sold">{{ 'collection.sold_out' | t }}</span>
-                {%- endif -%}
-              </div>
-
-            </a>
-
-            {%- comment -%} Quick add {%- endcomment -%}
-            {%- if section.settings.enable_quick_add -%}
-              <div class="coll-card__quick-wrap">
-                {%- if product.available -%}
-                  {%- if product.variants.size == 1 -%}
-                    {%- form 'product', product, class: 'coll-card__form' -%}
-                      <input type="hidden" name="id" value="{{ product.variants.first.id }}">
-                      <input type="hidden" name="quantity" value="1">
-                      <button type="submit" class="coll-card__quick-btn">
-                        <span>{{ 'collection.add_to_cart' | t }}</span>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          <path d="M2 2h1.5l2 8h7l1.5-5H5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                          <circle cx="7" cy="12.5" r="1" fill="currentColor"/>
-                          <circle cx="12" cy="12.5" r="1" fill="currentColor"/>
-                        </svg>
-                      </button>
-                    {%- endform -%}
-                  {%- else -%}
-                    <a href="{{ product.url }}" class="coll-card__quick-btn">
-                      <span>{{ 'collection.choose_options' | t }}</span>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                        <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </a>
-                  {%- endif -%}
-                {%- else -%}
-                  <button class="coll-card__quick-btn coll-card__quick-btn--disabled" disabled>
-                    {{ 'collection.sold_out' | t }}
-                  </button>
-                {%- endif -%}
-              </div>
-            {%- endif -%}
-          </div>
-
-          {%- comment -%} Card info {%- endcomment -%}
-          <div class="coll-card__info">
-            {%- if section.settings.show_vendor and product.vendor != blank -%}
-              <p class="coll-card__vendor">{{ product.vendor }}</p>
-            {%- endif -%}
-
-            <a href="{{ product.url }}" class="coll-card__title-link">
-              <h3 class="coll-card__title">{{ product.title | escape }}</h3>
-            </a>
-
-            <div class="coll-card__price-wrap">
-              {%- if product.price_varies -%}
-                <span class="coll-card__from">{{ 'collection.from' | t }}</span>
-                <span class="coll-card__price">{{ product.price_min | money }}</span>
-              {%- elsif is_sale -%}
-                <span class="coll-card__price coll-card__price--sale">{{ product.price | money }}</span>
-                <s class="coll-card__compare">{{ product.compare_at_price | money }}</s>
               {%- else -%}
-                <span class="coll-card__price">{{ product.price | money }}</span>
+                {{ 'collection-1' | placeholder_svg_tag: 'coll-card__placeholder' }}
               {%- endif -%}
+
+              <div class="coll-card__overlay">
+                <div class="coll-card__overlay-body">
+                  <h2 class="coll-card__name">{{ coll.title }}</h2>
+                  {%- if section.settings.show_product_count -%}
+                    <p class="coll-card__count">
+                      {{ 'collection.products_count' | t: count: coll.all_products_count }}
+                    </p>
+                  {%- endif -%}
+                  <span class="coll-card__cta" aria-hidden="true">
+                    {{ 'collection.shop_now' | t }}
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
 
+          </a>
         </div>
-      {%- endfor -%}
-    </div>
-
-  {%- else -%}
-    <div class="coll-empty">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-        <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" opacity=".3"/>
-        <path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
-      </svg>
-      <p class="coll-empty__text">{{ 'collection.no_products' | t }}</p>
-    </div>
-  {%- endif -%}
-
-  {%- comment -%} Pagination {%- endcomment -%}
-  {%- if paginate.pages > 1 -%}
-    <div class="coll-pagination">
-      {{ paginate | default_pagination }}
-    </div>
-  {%- endif -%}
-
+      {%- endunless -%}
+    {%- endfor -%}
+  </div>
 </div>
-
-{%- endpaginate -%}
 
 {% stylesheet %}
   /* ─────────────────────────────────────────────────────
      Keyframes
   ───────────────────────────────────────────────────── */
-  @keyframes coll-card-in {
-    from { opacity: 0; transform: translateY(36px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
   @keyframes coll-hero-in {
-    from { opacity: 0; transform: translateY(24px); }
+    from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   /* ─────────────────────────────────────────────────────
-     Hero
+     Page header
   ───────────────────────────────────────────────────── */
-  .coll-hero {
-    position: relative;
-    min-height: 340px;
-    display: flex;
-    align-items: flex-end;
-    overflow: hidden;
-    background: #1c1a18;
-  }
-
   .coll-hero--plain {
-    min-height: 200px;
-    background: #faf8f5;
+    background: linear-gradient(135deg, #faf7f4 0%, #f0ebe4 100%);
+    display: flex;
     align-items: center;
-  }
-
-  .coll-hero__img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .coll-hero__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.75) 0%,
-      rgba(0, 0, 0, 0.3) 50%,
-      rgba(0, 0, 0, 0.1) 100%
-    );
+    min-height: 180px;
   }
 
   .coll-hero__content {
@@ -267,11 +94,7 @@
     max-width: var(--page-width);
     margin: 0 auto;
     padding: 3rem var(--page-margin);
-    animation: coll-hero-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .coll-hero--plain .coll-hero__content {
-    padding: 2.5rem var(--page-margin);
+    animation: coll-hero-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   /* Breadcrumb */
@@ -281,13 +104,10 @@
     gap: 0.5rem;
     font-family: var(--font-primary--family);
     font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 0.75rem;
-  }
-
-  .coll-hero--plain .coll-hero__breadcrumb {
     color: var(--color-foreground);
-    opacity: 0.5;
+    opacity: 0.45;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.01em;
   }
 
   .coll-hero__breadcrumb-link {
@@ -296,35 +116,31 @@
     transition: opacity 0.15s;
   }
 
-  .coll-hero__breadcrumb-link:hover { opacity: 0.8; }
+  .coll-hero__breadcrumb-link:hover,
+  .coll-hero__breadcrumb-link:focus-visible {
+    opacity: 0.7;
+    text-decoration: underline;
+  }
 
   /* Title */
   .coll-hero__title {
     font-family: var(--font-primary--family);
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(1.875rem, 4vw, 3rem);
     font-weight: 800;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.03em;
     line-height: 1.1;
-    color: #ffffff;
-    margin: 0 0 0.75rem;
-  }
-
-  .coll-hero--plain .coll-hero__title {
     color: var(--color-foreground);
+    margin: 0 0 0.5rem;
   }
 
   .coll-hero__desc {
     font-family: var(--font-primary--family);
     font-size: 1rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.75);
-    margin: 0;
-    max-width: 54ch;
-  }
-
-  .coll-hero--plain .coll-hero__desc {
+    line-height: 1.65;
     color: var(--color-foreground);
-    opacity: 0.6;
+    opacity: 0.55;
+    margin: 0;
+    max-width: 52ch;
   }
 
   /* ─────────────────────────────────────────────────────
@@ -333,108 +149,57 @@
   .coll-main {
     max-width: var(--page-width);
     margin: 0 auto;
-    padding: 0 var(--page-margin) 5rem;
+    padding: 3rem var(--page-margin) 5rem;
   }
 
   /* ─────────────────────────────────────────────────────
-     Toolbar
-  ───────────────────────────────────────────────────── */
-  .coll-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    margin-bottom: 2rem;
-    gap: 1rem;
-  }
-
-  .coll-toolbar__count {
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    color: var(--color-foreground);
-    opacity: 0.5;
-    margin: 0;
-  }
-
-  .coll-toolbar__sort {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-  }
-
-  .coll-toolbar__sort-label {
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--color-foreground);
-    white-space: nowrap;
-  }
-
-  .coll-toolbar__select-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .coll-toolbar__select {
-    appearance: none;
-    background: none;
-    border: 1.5px solid rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    padding: 0.5rem 2.25rem 0.5rem 0.875rem;
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    color: var(--color-foreground);
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.15s ease;
-  }
-
-  .coll-toolbar__select:focus {
-    border-color: var(--color-foreground);
-  }
-
-  .coll-toolbar__select-icon {
-    position: absolute;
-    right: 0.625rem;
-    pointer-events: none;
-    color: var(--color-foreground);
-    opacity: 0.5;
-  }
-
-  /* ─────────────────────────────────────────────────────
-     Product grid
+     Collections grid
   ───────────────────────────────────────────────────── */
   .coll-grid {
     display: grid;
-    grid-template-columns: repeat(var(--cols-mob, 2), 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(var(--cols-mob, 1), 1fr);
+    gap: 1.25rem;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .coll-grid {
-      grid-template-columns: repeat(var(--cols-desk, 3), 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
     }
   }
 
+  @media (min-width: 1024px) {
+    .coll-grid {
+      grid-template-columns: repeat(var(--cols-desk, 3), 1fr);
+      gap: 2rem;
+    }
+  }
+
   /* ─────────────────────────────────────────────────────
-     Product card
+     Collection card
   ───────────────────────────────────────────────────── */
   .coll-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--color-background);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(30, 20, 10, 0.08);
+    transition:
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .coll-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(30, 20, 10, 0.14);
   }
 
   /* Reveal animation */
   .coll-card--reveal {
     opacity: 0;
-    transform: translateY(36px);
+    transform: translateY(40px);
     transition:
-      opacity  0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
-      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms);
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
+      box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .coll-card--reveal.is-visible {
@@ -442,19 +207,32 @@
     transform: translateY(0);
   }
 
+  .coll-card--reveal.is-visible:hover {
+    transform: translateY(-6px);
+  }
+
+  /* Link fills the entire card */
+  .coll-card__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+
   /* ── Media ── */
   .coll-card__media {
     position: relative;
     overflow: hidden;
-    border-radius: 12px;
-    background: #f2eeea;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 4 / 5;
+    background: #e8e1d8;
+    width: 100%;
   }
 
-  .coll-card__img-link {
-    display: block;
-    width: 100%;
-    height: 100%;
+  /* Two-column layout gets a wider aspect ratio */
+  @media (min-width: 640px) {
+    .coll-grid[style*="--cols-desk: 2"] .coll-card__media {
+      aspect-ratio: 3 / 4;
+    }
   }
 
   .coll-card__img {
@@ -464,280 +242,149 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  .coll-card__img--primary {
-    transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  .coll-card:hover .coll-card__img {
+    transform: scale(1.07);
   }
 
-  .coll-card:hover .coll-card__img--primary {
-    transform: scale(1.06);
-  }
-
-  .coll-card__img--secondary {
-    opacity: 0;
-    transition: opacity 0.45s ease;
-    z-index: 1;
-  }
-
-  .coll-card:hover .coll-card__img--secondary {
-    opacity: 1;
-  }
-
-  .coll-card__img--placeholder {
-    opacity: 0.2;
-  }
-
-  /* ── Badges ── */
-  .coll-card__badges {
+  .coll-card__placeholder {
     position: absolute;
-    top: 0.75rem;
-    left: 0.75rem;
-    z-index: 3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.18;
+    display: block;
+  }
+
+  /* ── Overlay ── */
+  .coll-card__overlay {
+    position: absolute;
+    inset: 0;
+    /* Gradient: transparent top → dark bottom */
+    background: linear-gradient(
+      to top,
+      rgba(10, 7, 4, 0.85) 0%,
+      rgba(10, 7, 4, 0.45) 35%,
+      rgba(10, 7, 4, 0.0)  65%
+    );
+    display: flex;
+    align-items: flex-end;
+    padding: 1.75rem 1.5rem;
+    transition: background 0.4s ease;
+  }
+
+  .coll-card:hover .coll-card__overlay {
+    background: linear-gradient(
+      to top,
+      rgba(10, 7, 4, 0.92) 0%,
+      rgba(10, 7, 4, 0.55) 40%,
+      rgba(10, 7, 4, 0.05) 70%
+    );
+  }
+
+  .coll-card__overlay-body {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
+    width: 100%;
   }
 
-  .coll-card__badge {
+  .coll-card__name {
+    font-family: var(--font-primary--family);
+    font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .coll-card__count {
+    font-family: var(--font-primary--family);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Shop now CTA (slides in on hover) ── */
+  .coll-card__cta {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.625rem;
-    border-radius: 6px;
+    gap: 0.375rem;
     font-family: var(--font-primary--family);
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    line-height: 1;
-  }
-
-  .coll-card__badge--sale {
-    background: #c0392b;
     color: #ffffff;
+    margin-top: 0.375rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
   }
 
-  .coll-card__badge--sold {
-    background: rgba(0, 0, 0, 0.55);
-    color: #ffffff;
-  }
-
-  /* ── Quick add ── */
-  .coll-card__quick-wrap {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 4;
-    padding: 0.75rem;
-    transform: translateY(calc(100% + 1px));
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .coll-card:hover .coll-card__quick-wrap {
+  .coll-card:hover .coll-card__cta {
+    opacity: 1;
     transform: translateY(0);
   }
 
-  .coll-card__form { margin: 0; }
-
-  .coll-card__quick-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: var(--color-foreground);
-    color: var(--color-background);
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.15s ease;
-    white-space: nowrap;
-  }
-
-  .coll-card__quick-btn:hover { opacity: 0.82; }
-
-  .coll-card__quick-btn--disabled {
-    background: rgba(0, 0, 0, 0.2);
-    cursor: not-allowed;
-  }
-
-  .coll-card__quick-btn--disabled:hover { opacity: 1; }
-
-  /* ── Info ── */
-  .coll-card__info {
-    padding: 1rem 0.25rem 0.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    flex: 1;
-  }
-
-  .coll-card__vendor {
-    font-family: var(--font-primary--family);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-foreground);
-    opacity: 0.45;
-    margin: 0;
-  }
-
-  .coll-card__title-link {
-    text-decoration: none;
-    color: var(--color-foreground);
-  }
-
-  .coll-card__title {
-    font-family: var(--font-primary--family);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--color-foreground);
-    margin: 0;
-    line-height: 1.35;
-    transition: opacity 0.15s ease;
-  }
-
-  .coll-card__title-link:hover .coll-card__title { opacity: 0.65; }
-
-  .coll-card__price-wrap {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .coll-card__from {
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    color: var(--color-foreground);
-    opacity: 0.5;
-  }
-
-  .coll-card__price {
-    font-family: var(--font-primary--family);
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: var(--color-foreground);
-  }
-
-  .coll-card__price--sale { color: #c0392b; }
-
-  .coll-card__compare {
-    font-family: var(--font-primary--family);
-    font-size: 0.8125rem;
-    color: var(--color-foreground);
-    opacity: 0.4;
-    text-decoration: line-through;
-  }
-
   /* ─────────────────────────────────────────────────────
-     Empty state
+     Mobile
   ───────────────────────────────────────────────────── */
-  .coll-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6rem 2rem;
-    gap: 1.25rem;
-    color: var(--color-foreground);
-  }
+  @media (max-width: 639px) {
+    .coll-hero--plain {
+      min-height: 140px;
+    }
 
-  .coll-empty__text {
-    font-family: var(--font-primary--family);
-    font-size: 1rem;
-    opacity: 0.5;
-    margin: 0;
-  }
+    .coll-main {
+      padding-top: 2rem;
+      padding-bottom: 3rem;
+    }
 
-  /* ─────────────────────────────────────────────────────
-     Pagination
-  ───────────────────────────────────────────────────── */
-  .coll-pagination {
-    display: flex;
-    justify-content: center;
-    padding: 3rem 0 0;
-  }
+    .coll-card {
+      border-radius: 14px;
+    }
 
-  .coll-pagination .pagination,
-  .coll-pagination span {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+    .coll-card__overlay {
+      padding: 1.25rem 1rem;
+    }
 
-  .coll-pagination a,
-  .coll-pagination .current,
-  .coll-pagination span.prev,
-  .coll-pagination span.next {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0 0.5rem;
-    border-radius: 10px;
-    font-family: var(--font-primary--family);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    color: var(--color-foreground);
-    border: 1.5px solid transparent;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .coll-pagination a:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.1);
-  }
-
-  .coll-pagination .current {
-    background: var(--color-foreground);
-    color: var(--color-background);
-    font-weight: 700;
-  }
-
-  .coll-pagination .prev a,
-  .coll-pagination .next a {
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    border-color: rgba(0, 0, 0, 0.12);
-  }
-
-  /* ─────────────────────────────────────────────────────
-     Mobile adjustments
-  ───────────────────────────────────────────────────── */
-  @media (max-width: 640px) {
-    .coll-hero { min-height: 240px; }
-    .coll-main { padding-bottom: 3rem; }
-    .coll-toolbar { padding: 1.25rem 0; margin-bottom: 1.25rem; }
-    .coll-toolbar__sort-label { display: none; }
-    .coll-card__quick-wrap { transform: translateY(0); padding: 0.5rem; }
-    .coll-card__quick-btn { padding: 0.625rem 0.75rem; font-size: 0.75rem; }
+    /* Always show CTA on touch devices (no hover) */
+    .coll-card__cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* ─────────────────────────────────────────────────────
      Reduced motion
   ───────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
-    .coll-card--reveal {
+    .coll-card--reveal,
+    .coll-card {
       opacity: 1;
       transform: none;
       transition: none;
     }
-    .coll-card__img--primary { transition: none; }
-    .coll-card__img--secondary { transition: none; }
-    .coll-card__quick-wrap { transform: translateY(0); transition: none; }
+
+    .coll-card:hover {
+      transform: none;
+    }
+
+    .coll-card__img {
+      transition: none;
+    }
+
+    .coll-card__cta {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 {% endstylesheet %}
 
@@ -758,11 +405,13 @@
           var el = entry.target;
           el.classList.add('is-visible');
           var delay = parseInt(el.style.getPropertyValue('--stagger') || '0', 10);
-          setTimeout(function () { el.style.setProperty('--stagger', '0ms'); }, 700 + delay);
+          setTimeout(function () {
+            el.style.setProperty('--stagger', '0ms');
+          }, 700 + delay);
           observer.unobserve(el);
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
     );
 
     cards.forEach(function (c) { observer.observe(c); });
@@ -778,9 +427,15 @@
       "content": "t:general.content"
     },
     {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": ""
+    },
+    {
       "type": "checkbox",
-      "id": "show_collection_image",
-      "label": "t:labels.show_collection_image",
+      "id": "show_product_count",
+      "label": "t:labels.show_product_count",
       "default": true
     },
     {
@@ -806,38 +461,7 @@
         { "value": "1", "label": "1" },
         { "value": "2", "label": "2" }
       ],
-      "default": "2"
-    },
-    {
-      "type": "range",
-      "id": "products_per_page",
-      "label": "t:labels.products_per_page",
-      "min": 8,
-      "max": 48,
-      "step": 4,
-      "default": 12
-    },
-    {
-      "type": "header",
-      "content": "t:general.product"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_vendor",
-      "label": "t:labels.show_vendor",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "show_secondary_image",
-      "label": "t:labels.show_secondary_image",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_quick_add",
-      "label": "t:labels.enable_quick_add",
-      "default": true
+      "default": "1"
     }
   ]
 }
