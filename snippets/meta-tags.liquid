@@ -97,9 +97,22 @@
   href="{{ canonical_url }}"
 >
 
-{% if page_description %}
+{%- if settings.favicon != blank -%}
+  <link
+    rel="icon"
+    type="image/png"
+    href="{{ settings.favicon | image_url: width: 32 }}"
+  >
+  <link
+    rel="apple-touch-icon"
+    href="{{ settings.favicon | image_url: width: 180 }}"
+  >
+{%- endif -%}
+
+{%- assign seo_description = page_description | default: shop.description -%}
+{% if seo_description != blank %}
   <meta
     name="description"
-    content="{{ page_description | escape }}"
+    content="{{ seo_description | escape }}"
   >
 {% endif %}

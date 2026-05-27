@@ -13,7 +13,12 @@
       "Bash(grep -rn \"shpat_[a-zA-Z0-9_-]\\\\{10,\\\\}\\\\|sk-[a-zA-Z0-9]\\\\{30,\\\\}\\\\|AKIA[A-Z0-9]\\\\{16\\\\}\\\\|ghp_[a-zA-Z0-9]\\\\{36\\\\}\" --include=\"*.liquid\" --include=\"*.js\" .)",
       "Bash(npx playwright *)",
       "Bash(cat playwright.config.ts)",
-      "Bash(cat playwright.config.js)"
+      "Bash(cat playwright.config.js)",
+      "Bash(npx -y lighthouse https://woodencraft-xqegpzdo.myshopify.com --output=json --output-path=./tmp/lh-mobile.json --quiet '--chrome-flags=--headless --no-sandbox')",
+      "Bash(npx -y lighthouse https://woodencraft-xqegpzdo.myshopify.com --output=json --output-path=./tmp/lh-mobile.json '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage')",
+      "Bash(npx -y lighthouse https://woodencraft-xqegpzdo.myshopify.com --preset=desktop --output=json --output-path=./tmp/lh-desktop.json '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage')",
+      "Bash(node -e ' *)",
+      "Bash(node *)"
     ]
   }
 }
