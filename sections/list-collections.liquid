@@ -1,0 +1,201 @@
+{%- comment -%} ── Collections Listing Page ────────────────────── {%- endcomment -%}
+
+{%- paginate collections by 48 -%}
+  {%- comment -%} ── Page header ── {%- endcomment -%}
+  <div class="coll-hero coll-hero--plain">
+    <div class="coll-hero__content">
+      <nav class="coll-hero__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}" class="coll-hero__breadcrumb-link">Home</a>
+        <span aria-hidden="true"> / </span>
+        <span aria-current="page">Collections</span>
+      </nav>
+      <h1 class="coll-hero__title">
+        {%- if section.settings.title != blank -%}
+          {{ section.settings.title }}
+        {%- else -%}
+          Our Collections
+        {%- endif -%}
+      </h1>
+      {%- if section.settings.subheading != blank -%}
+        <p class="coll-hero__desc">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} ── Collections grid ── {%- endcomment -%}
+  <div class="coll-main">
+    {%- if collections.size > 0 -%}
+      <div
+        class="coll-grid"
+        style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
+      >
+        {%- for coll in collections -%}
+          {%- comment -%} Frontpage या खाली कलेक्शन को छोड़ने के लिए {%- endcomment -%}
+          {%- unless coll.handle == 'frontpage' -%}
+            <div class="coll-card is-visible"> {% comment %} "is-visible" added for safety {% endcomment %}
+              <a href="{{ coll.url }}" class="coll-card__link" aria-label="{{ coll.title }}">
+
+                <div class="coll-card__media">
+                  {%- if coll.featured_image != blank -%}
+                    {{- coll.featured_image
+                      | image_url: width: 800, format: 'webp'
+                      | image_tag:
+                        class: 'coll-card__img',
+                        alt: coll.title,
+                        loading: 'lazy'
+                    -}}
+                  {%- elsif coll.products.first.featured_image != blank -%}
+                    {{- coll.products.first.featured_image
+                      | image_url: width: 800, format: 'webp'
+                      | image_tag:
+                        class: 'coll-card__img',
+                        alt: coll.title,
+                        loading: 'lazy'
+                    -}}
+                  {%- else -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'coll-card__placeholder' }}
+                  {%- endif -%}
+
+                  <div class="coll-card__overlay">
+                    <div class="coll-card__overlay-body">
+                      <h2 class="coll-card__name">{{ coll.title }}</h2>
+                      {%- if section.settings.show_product_count -%}
+                        <p class="coll-card__count">
+                          {{ coll.all_products_count }} Products
+                        </p>
+                      {%- endif -%}
+                      <span class="coll-card__cta">
+                        Shop Now
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </a>
+            </div>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="coll-empty" style="text-align: center; padding: 5rem 0;">
+        <p>No collections found.</p>
+      </div>
+    {%- endif -%}
+
+    {%- if paginate.pages > 1 -%}
+      <div class="pagination" style="text-align: center; margin-top: 3rem;">
+        {{ paginate | default_pagination }}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endpaginate -%}
+
+{% stylesheet %}
+  .coll-hero--plain {
+    background: #faf7f4;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+  }
+  .coll-hero__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+  }
+  .coll-hero__breadcrumb { font-size: 0.8rem; margin-bottom: 1rem; opacity: 0.6; }
+  .coll-hero__title { font-size: 3rem; font-weight: 800; margin: 0; }
+  .coll-hero__desc { font-size: 1.1rem; opacity: 0.7; margin-top: 0.5rem; }
+
+  .coll-main { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+
+  .coll-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-mob, 1), 1fr);
+    gap: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .coll-grid { grid-template-columns: repeat(var(--cols-desk, 3), 1fr); }
+  }
+
+  .coll-card {
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    background: #f0f0f0;
+    transition: transform 0.3s ease;
+  }
+  .coll-card:hover { transform: translateY(-5px); }
+  
+  .coll-card__media { position: relative; aspect-ratio: 4/5; }
+  .coll-card__img { width: 100%; height: 100%; object-fit: cover; }
+  
+  .coll-card__overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    color: white;
+  }
+  .coll-card__name { color: white; margin: 0; font-size: 1.5rem; }
+  .coll-card__count { font-size: 0.9rem; opacity: 0.8; margin: 5px 0; }
+  .coll-card__cta { 
+    display: flex; align-items: center; gap: 5px; 
+    font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+    margin-top: 10px;
+  }
+  .coll-card__link { text-decoration: none; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection List All",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Collections"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Browse our curated selection of high-quality furniture."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns Desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns Mobile",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection List All"
+    }
+  ]
+}
+{% endschema %}
