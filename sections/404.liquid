@@ -1,23 +1,267 @@
-{% comment %}
-  This section is used in the 404 template to render page shown when customers
-  enter an invalid store URL.
+{%- comment -%} Styled 404 Not Found — animated empty state {%- endcomment -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/404
-{% endcomment %}
+<section class="page-404">
+  <div class="page-404__container">
 
-<h1>{{ '404.title' | t }}</h1>
+    <div class="page-404__art" aria-hidden="true">
+      <!-- Animated 404 Typography -->
+      <div class="err-digits">
+        <span class="err-digit">4</span>
+        <div class="err-zero">
+          <svg viewBox="0 0 80 100" fill="none" class="err-chair">
+            <rect x="15" y="55" width="50" height="4" rx="2" fill="#c49a5e"/>
+            <rect x="20" y="59" width="4" height="30" rx="2" fill="#c49a5e" opacity="0.8"/>
+            <rect x="56" y="59" width="4" height="30" rx="2" fill="#c49a5e" opacity="0.8"/>
+            <rect x="28" y="59" width="4" height="22" rx="2" fill="#c49a5e" opacity="0.6"/>
+            <rect x="48" y="59" width="4" height="22" rx="2" fill="#c49a5e" opacity="0.6"/>
+            <path d="M20 55 Q20 20 40 15 Q60 20 60 55" stroke="#c49a5e" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <rect x="17" y="35" width="46" height="22" rx="4" fill="#c49a5e" opacity="0.2"/>
+          </svg>
+        </div>
+        <span class="err-digit">4</span>
+      </div>
+    </div>
 
-<p>
-  {{ '404.not_found' | t }}
-</p>
+    <div class="page-404__content">
+      <div class="page-404__badge">Error 404</div>
+      <h1 class="page-404__title">{{ '404.title' | t }}</h1>
+      <p class="page-404__text">
+        {{ '404.not_found' | t }}
+      </p>
+      <div class="page-404__actions">
+        <a href="{{ routes.root_url }}" class="btn-404 btn-404--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Go Home
+        </a>
+        <a href="{{ routes.all_products_collection_url }}" class="btn-404 btn-404--outline">
+          {{ '404.back_to_shopping' | t }}
+        </a>
+      </div>
+    </div>
 
-<a href="{{ routes.all_products_collection_url }}">
-  {{ '404.back_to_shopping' | t }}
-</a>
+    <!-- Decorative floating shapes -->
+    <div class="page-404__deco" aria-hidden="true">
+      <span class="deco-ring deco-ring--1"></span>
+      <span class="deco-ring deco-ring--2"></span>
+      <span class="deco-dot deco-dot--1"></span>
+      <span class="deco-dot deco-dot--2"></span>
+      <span class="deco-dot deco-dot--3"></span>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ── Shell ─────────────────────────────────────────────── */
+  .page-404 {
+    min-height: calc(100vh - 140px);
+    background: #0e0e0e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-404::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 20% 80%, rgba(196,154,94,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 20%, rgba(196,154,94,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .page-404__container {
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── 404 Art ───────────────────────────────────────────── */
+  .err-digits {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 40px;
+    line-height: 1;
+  }
+
+  @keyframes digit-drop {
+    0% { opacity: 0; transform: translateY(-60px) scale(0.7); }
+    60% { transform: translateY(8px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes chair-bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%       { transform: translateY(-12px) rotate(2deg); }
+  }
+
+  .err-digit {
+    font-size: clamp(6rem, 14vw, 10rem);
+    font-weight: 900;
+    color: #fff;
+    opacity: 0.12;
+    letter-spacing: -0.04em;
+    animation: digit-drop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    display: block;
+    line-height: 1;
+  }
+  .err-digit:last-child {
+    animation-delay: 0.15s;
+  }
+  .err-zero {
+    width: clamp(5rem, 12vw, 8.5rem);
+    flex-shrink: 0;
+    animation: digit-drop 0.7s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .err-chair {
+    width: 100%;
+    height: auto;
+    animation: chair-bob 3.5s ease-in-out infinite;
+    filter: drop-shadow(0 20px 30px rgba(196,154,94,0.25));
+  }
+
+  /* ── Content ───────────────────────────────────────────── */
+  @keyframes content-rise {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-404__content {
+    animation: content-rise 0.7s 0.35s both cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .page-404__badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #c49a5e;
+    border: 1px solid rgba(196,154,94,0.4);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .page-404__title {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.03em;
+    margin: 0 0 14px;
+  }
+  .page-404__text {
+    color: rgba(255,255,255,0.5);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 400px;
+    margin: 0 auto 36px;
+  }
+
+  /* ── Action buttons ────────────────────────────────────── */
+  .page-404__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-404 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 30px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+  .btn-404--primary {
+    background: #c49a5e;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(196,154,94,0.25);
+  }
+  .btn-404--primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 36px rgba(196,154,94,0.4);
+  }
+  .btn-404--outline {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(255,255,255,0.2);
+  }
+  .btn-404--outline:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* ── Decorative elements ───────────────────────────────── */
+  @keyframes ring-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.12; }
+    50%       { transform: scale(1.1); opacity: 0.06; }
+  }
+  @keyframes dot-drift {
+    0%, 100% { transform: translate(0, 0); }
+    33%       { transform: translate(8px, -12px); }
+    66%       { transform: translate(-6px, 6px); }
+  }
+
+  .deco-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(196,154,94,0.3);
+    pointer-events: none;
+  }
+  .deco-ring--1 {
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ring-pulse 5s ease-in-out infinite;
+  }
+  .deco-ring--2 {
+    width: 650px;
+    height: 650px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ring-pulse 5s 1.5s ease-in-out infinite;
+  }
+  .deco-dot {
+    position: absolute;
+    border-radius: 50%;
+    background: #c49a5e;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  .deco-dot--1 { width: 6px; height: 6px; top: 20%; left: 15%; animation: dot-drift 6s ease-in-out infinite; }
+  .deco-dot--2 { width: 4px; height: 4px; top: 70%; right: 12%; animation: dot-drift 8s 2s ease-in-out infinite; }
+  .deco-dot--3 { width: 8px; height: 8px; bottom: 25%; left: 60%; animation: dot-drift 7s 1s ease-in-out infinite; }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .page-404 { padding: 60px 20px; }
+    .err-digits { gap: 0; }
+    .page-404__actions { flex-direction: column; align-items: stretch; }
+    .btn-404 { justify-content: center; }
+  }
+</style>
 
 {% schema %}
 {
   "name": "t:general.404",
-  "settings": []
+  "settings": [],
+  "presets": [
+    {
+      "name": "404 Page"
+    }
+  ]
 }
 {% endschema %}

@@ -1,35 +1,321 @@
-{% comment %}
-  This section is used in the blog template to render the blog page listing all
-  articles within a blog.
+{%- comment -%} Blog listing — hero + card grid with entrance animations {%- endcomment -%}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/blog
-{% endcomment %}
+<section class="blog-section">
 
-<h1>{{ blog.title }}</h1>
-
-{% paginate blog.articles by 5 %}
-  {% for article in blog.articles %}
-    <div>
-      {% if article.image %}
-        {{ article.image | image_url: width: 1000 | image_tag }}
-      {% endif %}
-      <h2>
-        {{ article.title | link_to: article.url }}
-      </h2>
-      {% assign date = article.published_at | time_tag: format: 'date' %}
-      <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-      <p>{{ article.excerpt }}</p>
+  <!-- Hero -->
+  <div class="blog-hero">
+    <div class="blog-hero__inner">
+      <nav class="blog-hero__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}">Home</a>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        <span>Blog</span>
+      </nav>
+      <h1 class="blog-hero__title">{{ blog.title }}</h1>
+      <p class="blog-hero__subtitle">Stories, tips & inspiration for your home</p>
     </div>
-  {% endfor %}
+  </div>
 
-  {%- if paginate.pages > 1 -%}
-    {{- paginate | default_pagination -}}
-  {%- endif -%}
-{% endpaginate %}
+  <!-- Articles grid -->
+  <div class="blog-body">
+    <div class="blog-container">
+
+      {%- paginate blog.articles by 9 -%}
+
+        {%- if blog.articles_count > 0 -%}
+          <div class="blog-grid">
+            {%- for article in blog.articles -%}
+              <article class="blog-card" style="animation-delay: {{ forloop.index0 | times: 0.07 }}s">
+                <a href="{{ article.url }}" class="blog-card__link" tabindex="-1" aria-hidden="true">
+                  <div class="blog-card__media">
+                    {%- if article.image -%}
+                      {{-
+                        article.image
+                        | image_url: width: 700, format: 'webp'
+                        | image_tag:
+                          class: 'blog-card__img',
+                          alt: article.image.alt | default: article.title,
+                          loading: 'lazy',
+                          width: 700,
+                          height: 460
+                      -}}
+                    {%- else -%}
+                      <div class="blog-card__placeholder">
+                        {{ 'image' | placeholder_svg_tag: 'blog-card__placeholder-svg' }}
+                      </div>
+                    {%- endif -%}
+                    <div class="blog-card__overlay"></div>
+                  </div>
+                </a>
+                <div class="blog-card__body">
+                  <div class="blog-card__meta">
+                    {%- assign date = article.published_at | time_tag: format: 'date' -%}
+                    <time class="blog-card__date">{{ article.published_at | date: '%b %d, %Y' }}</time>
+                    <span class="blog-card__dot" aria-hidden="true"></span>
+                    <span class="blog-card__author">{{ article.author }}</span>
+                  </div>
+                  <h2 class="blog-card__title">
+                    <a href="{{ article.url }}">{{ article.title }}</a>
+                  </h2>
+                  {%- if article.excerpt != blank -%}
+                    <p class="blog-card__excerpt">{{ article.excerpt | strip_html | truncate: 110 }}</p>
+                  {%- endif -%}
+                  <a href="{{ article.url }}" class="blog-card__read-more" aria-label="Read {{ article.title | escape }}">
+                    Read More
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </a>
+                </div>
+              </article>
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.pages > 1 -%}
+            <nav class="blog-pagination" aria-label="Blog pagination">
+              {{ paginate | default_pagination }}
+            </nav>
+          {%- endif -%}
+
+        {%- else -%}
+          <div class="blog-empty">
+            <p>No posts yet — check back soon!</p>
+          </div>
+        {%- endif -%}
+
+      {%- endpaginate -%}
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────── */
+  .blog-hero {
+    background: #1a1a1a;
+    padding: 70px 24px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 100% 0%, rgba(196,154,94,0.14) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .blog-hero__inner {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .blog-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .blog-hero__breadcrumb a {
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .blog-hero__breadcrumb a:hover { color: #c49a5e; }
+  .blog-hero__breadcrumb svg { color: rgba(255,255,255,0.2); }
+  .blog-hero__breadcrumb span { color: rgba(255,255,255,0.7); }
+  .blog-hero__title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.04em;
+    margin: 0 0 10px;
+  }
+  .blog-hero__subtitle {
+    color: rgba(255,255,255,0.45);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* ── Body ──────────────────────────────────────────────── */
+  .blog-section { background: #fafaf8; }
+  .blog-body { padding: 64px 24px 100px; }
+  .blog-container { max-width: 1400px; margin: 0 auto; }
+
+  /* ── Grid ──────────────────────────────────────────────── */
+  @keyframes blog-card-in {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .blog-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1);
+    animation: blog-card-in 0.5s both cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 56px rgba(0,0,0,0.12);
+  }
+
+  /* Media */
+  .blog-card__media {
+    position: relative;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #e8e4de;
+  }
+  .blog-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .blog-card:hover .blog-card__img {
+    transform: scale(1.06);
+  }
+  .blog-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20%;
+    opacity: 0.2;
+  }
+  .blog-card__placeholder-svg { width: 100%; height: 100%; }
+  .blog-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.06) 100%);
+  }
+
+  /* Body */
+  .blog-card__body {
+    padding: 24px 22px 26px;
+  }
+  .blog-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #aaa;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .blog-card__dot {
+    width: 3px;
+    height: 3px;
+    background: #ccc;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .blog-card__date { color: #c49a5e; }
+  .blog-card__title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    margin: 0 0 10px;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .blog-card__title a {
+    color: #111;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .blog-card__title a:hover { color: #c49a5e; }
+  .blog-card__excerpt {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: #888;
+    margin: 0 0 16px;
+  }
+  .blog-card__read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #c49a5e;
+    text-decoration: none;
+    transition: gap 0.2s, color 0.2s;
+  }
+  .blog-card__read-more:hover {
+    gap: 10px;
+    color: #a07840;
+  }
+
+  /* ── Pagination ────────────────────────────────────────── */
+  .blog-pagination {
+    margin-top: 60px;
+    text-align: center;
+  }
+  .blog-pagination a,
+  .blog-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 8px;
+    margin: 0 3px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #666;
+    border: 1.5px solid #e8e5e0;
+    transition: all 0.2s;
+    background: #fff;
+  }
+  .blog-pagination a:hover,
+  .blog-pagination .current {
+    background: #c49a5e;
+    border-color: #c49a5e;
+    color: #fff;
+  }
+
+  /* ── Empty ─────────────────────────────────────────────── */
+  .blog-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #aaa;
+    font-size: 1rem;
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 1024px) { .blog-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    .blog-hero { padding: 50px 20px 50px; }
+    .blog-body { padding: 40px 16px 80px; }
+    .blog-grid { grid-template-columns: 1fr; gap: 20px; }
+  }
+</style>
 
 {% schema %}
 {
   "name": "t:general.blog",
-  "settings": []
+  "settings": [],
+  "presets": [
+    {
+      "name": "Blog"
+    }
+  ]
 }
 {% endschema %}
