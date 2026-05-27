@@ -1,83 +1,319 @@
-  {% comment %}
-    This section is used in the list-collections template to render a list of
-    collections.
+{%- comment -%} ── All Collections (Catalog) Page ──────────────── {%- endcomment -%}
 
-    https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
-  {% endcomment %}
-
-  <h1>{{ 'collections.title' | t }}</h1>
-
-  <div
-    class="collections {{ section.settings.grid_item_width }}"
-    style="--grid-gap: {{ section.settings.grid_gap }}px"
-  >
-    {% for collection in collections %}
-      <a class="collection-card" href="{{ collection.url }}">
-        {% if collection.featured_image %}
-          {% render 'image',
-            class: 'collection-card__image',
-            image: collection.featured_image,
-            width: 600,
-            height: 600,
-            crop: 'center'
-          %}
-        {% endif %}
-
-        <div class="collection-card__content">
-          <p>{{ collection.title }}</p>
-
-          {% if collection.description %}
-            <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-          {% endif %}
-        </div>
-      </a>
-    {% endfor %}
+{%- comment -%} ── Page Hero ── {%- endcomment -%}
+<div class="cat-hero">
+  <div class="cat-hero__content">
+    <nav class="cat-hero__breadcrumb" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}" class="cat-hero__bc-link">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page">Collections</span>
+    </nav>
+    <h1 class="cat-hero__title">
+      {%- if section.settings.title != blank -%}
+        {{ section.settings.title }}
+      {%- else -%}
+        Our Collections
+      {%- endif -%}
+    </h1>
+    {%- if section.settings.subheading != blank -%}
+      <p class="cat-hero__desc">{{ section.settings.subheading }}</p>
+    {%- endif -%}
   </div>
+</div>
 
-  {% stylesheet %}
-    .collections {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(var(--collection-card-size), 100%), 1fr));
-      gap: var(--grid-gap);
-    }
-    .collections--compact {
-      --collection-card-size: 160px;
-    }
-    .collections--full {
-      --collection-card-size: 280px;
-    }
-    .collection-card {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-    }
-  {% endstylesheet %}
+{%- comment -%} ── Collections Grid ── {%- endcomment -%}
+<div class="cat-main">
+  {%- if collections.size > 0 -%}
+    <div
+      class="cat-grid"
+      style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
+    >
+      {%- for coll in collections -%}
+        {%- unless coll.handle == 'frontpage' -%}
+          <div class="cat-card">
+            <a href="{{ coll.url }}" class="cat-card__link" aria-label="{{ coll.title }}">
 
-  {% schema %}
-  {
-    "name": "t:general.collections_grid",
-    "settings": [
-      {
-        "type": "select",
-        "id": "grid_item_width",
-        "label": "t:labels.grid_item_width",
-        "options": [
-          { "value": "collections--compact", "label": "t:options.size.small" },
-          { "value": "collections--full", "label": "t:options.size.large" }
-        ],
-        "default": "collections--full"
-      },
-      {
-        "type": "range",
-        "id": "grid_gap",
-        "label": "t:labels.grid_gap",
-        "min": 0,
-        "max": 50,
-        "step": 5,
-        "unit": "px",
-        "default": 10
-      }
-    ],
-    "presets": [{ "name": "t:general.collections_grid" }]
+              <div class="cat-card__media">
+                {%- if coll.featured_image != blank -%}
+                  {{-
+                    coll.featured_image
+                    | image_url: width: 800, format: 'webp'
+                    | image_tag:
+                      class: 'cat-card__img',
+                      alt: coll.title,
+                      loading: 'lazy',
+                      width: 800,
+                      height: 1000
+                  -}}
+                {%- elsif coll.products.first.featured_image != blank -%}
+                  {{-
+                    coll.products.first.featured_image
+                    | image_url: width: 800, format: 'webp'
+                    | image_tag:
+                      class: 'cat-card__img',
+                      alt: coll.title,
+                      loading: 'lazy',
+                      width: 800,
+                      height: 1000
+                  -}}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'cat-card__placeholder' }}
+                {%- endif -%}
+
+                <div class="cat-card__overlay">
+                  <div class="cat-card__overlay-body">
+                    <h2 class="cat-card__name">{{ coll.title }}</h2>
+                    {%- if section.settings.show_product_count -%}
+                      <p class="cat-card__count">{{ coll.all_products_count }} Products</p>
+                    {%- endif -%}
+                    <span class="cat-card__cta">
+                      Shop Now
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+            </a>
+          </div>
+        {%- endunless -%}
+      {%- endfor -%}
+    </div>
+  {%- else -%}
+    <div class="cat-empty">
+      <p>No collections found.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  /* ── Hero ── */
+  .cat-hero {
+    background: linear-gradient(135deg, #faf7f4 0%, #f0ebe3 100%);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
   }
-  {% endschema %}
+
+  .cat-hero__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    width: 100%;
+  }
+
+  .cat-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    opacity: 0.55;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .cat-hero__bc-link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .cat-hero__bc-link:hover { opacity: 1; }
+
+  .cat-hero__title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    line-height: 1.1;
+    color: var(--color-foreground, #1a1a1a);
+  }
+
+  .cat-hero__desc {
+    font-size: 1.0625rem;
+    color: var(--color-foreground, #1a1a1a);
+    opacity: 0.65;
+    margin: 0;
+    max-width: 600px;
+  }
+
+  /* ── Main ── */
+  .cat-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* ── Grid ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-mob, 1), 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .cat-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .cat-grid {
+      grid-template-columns: repeat(var(--cols-desk, 3), 1fr);
+      gap: 2rem;
+    }
+  }
+
+  /* ── Card ── */
+  .cat-card {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    background: #f0ece6;
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
+
+  .cat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.14);
+  }
+
+  .cat-card__link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .cat-card__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .cat-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .cat-card:hover .cat-card__img {
+    transform: scale(1.06);
+  }
+
+  .cat-card__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.25;
+  }
+
+  .cat-card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2.5rem 1.5rem 1.75rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);
+    color: #fff;
+  }
+
+  .cat-card__overlay-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .cat-card__name {
+    color: #fff;
+    margin: 0;
+    font-size: clamp(1.25rem, 2vw, 1.625rem);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .cat-card__count {
+    font-size: 0.875rem;
+    opacity: 0.75;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .cat-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 0.5rem;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .cat-card:hover .cat-card__cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Empty ── */
+  .cat-empty {
+    text-align: center;
+    padding: 4rem 0;
+    opacity: 0.5;
+    font-size: 1.125rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collections Catalog",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Our Collections"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Discover our curated furniture collections."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (Mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections Catalog"
+    }
+  ]
+}
+{% endschema %}

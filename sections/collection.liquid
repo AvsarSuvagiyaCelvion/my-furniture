@@ -1,61 +1,653 @@
-{%- comment -%} ── Single Collection (Product Grid) Page ────────────────────── {%- endcomment -%}
+{%- comment -%} ── Single Collection Products Page ──────────────── {%- endcomment -%}
 
-{% paginate collection.products by 12 %}
-  <div class="coll-hero coll-hero--plain">
-    <div class="coll-hero__content">
-      <nav class="coll-hero__breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ routes.root_url }}" class="coll-hero__breadcrumb-link">Home</a>
+{%- paginate collection.products by section.settings.products_per_page -%}
+
+  {%- comment -%} ── Collection Hero ── {%- endcomment -%}
+  <div class="sc-hero">
+    {%- if collection.image != blank -%}
+      <div class="sc-hero__bg">
+        {{-
+          collection.image
+          | image_url: width: 1600, format: 'webp'
+          | image_tag:
+            class: 'sc-hero__bg-img',
+            alt: collection.title,
+            loading: 'eager'
+        -}}
+        <div class="sc-hero__bg-overlay"></div>
+      </div>
+    {%- else -%}
+      <div class="sc-hero__bg sc-hero__bg--plain"></div>
+    {%- endif -%}
+
+    <div class="sc-hero__content">
+      <nav class="sc-hero__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}" class="sc-hero__bc-link">Home</a>
         <span aria-hidden="true"> / </span>
-        <a href="/collections" class="coll-hero__breadcrumb-link">Collections</a>
+        <a href="{{ routes.collections_url }}" class="sc-hero__bc-link">Collections</a>
         <span aria-hidden="true"> / </span>
         <span aria-current="page">{{ collection.title }}</span>
       </nav>
-      <h1 class="coll-hero__title">{{ collection.title }}</h1>
-      {% if collection.description != blank %}
-        <div class="coll-hero__desc">{{ collection.description }}</div>
-      {% endif %}
+      <h1 class="sc-hero__title">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}
+        <p class="sc-hero__desc">{{ collection.description | strip_html | truncatewords: 20 }}</p>
+      {%- endif -%}
+      <p class="sc-hero__count">{{ collection.products_count }} Products</p>
     </div>
   </div>
 
-  <div class="coll-main">
-    <div class="product-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-      {% for product in collection.products %}
-        <div class="product-card">
-          <a href="{{ product.url }}" style="text-decoration: none; color: inherit;">
-            <div class="product-card__image" style="aspect-ratio: 1/1; overflow: hidden; background: #f0f0f0;">
-              {% if product.featured_image %}
-                <img src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.title }}" style="width: 100%; height: 100%; object-fit: cover;">
-              {% else %}
-                {{ 'product-1' | placeholder_svg_tag }}
-              {% endif %}
-            </div>
-            <div class="product-card__info" style="padding: 10px 0;">
-              <h3 style="margin: 0; font-size: 1.1rem;">{{ product.title }}</h3>
-              <p style="margin: 5px 0; font-weight: bold;">{{ product.price | money }}</p>
-            </div>
-          </a>
+  {%- comment -%} ── Toolbar: sort ── {%- endcomment -%}
+  <div class="sc-toolbar">
+    <div class="sc-toolbar__inner">
+      <p class="sc-toolbar__results" aria-live="polite">
+        Showing {{ paginate.current_offset | plus: 1 }}–{{ paginate.current_offset | plus: collection.products.size }} of {{ collection.products_count }} products
+      </p>
+
+      <div class="sc-toolbar__sort">
+        <label for="sc-sort" class="sc-toolbar__sort-label">Sort by</label>
+        <div class="sc-toolbar__sort-wrap">
+          <select id="sc-sort" class="sc-toolbar__sort-select" onchange="window.location.href = this.value">
+            {%- assign sort_options = collection.sort_options -%}
+            {%- for option in sort_options -%}
+              <option
+                value="{{ collection.url }}?sort_by={{ option.value }}"
+                {%- if collection.sort_by == option.value %} selected{%- endif -%}
+              >
+                {{- option.name -}}
+              </option>
+            {%- endfor -%}
+          </select>
+          <svg class="sc-toolbar__sort-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true">
+            <path d="M1 1.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-      {% else %}
-        <p style="text-align: center; width: 100%;">No products found in this collection.</p>
-      {% endfor %}
-    </div>
-
-    {% if paginate.pages > 1 %}
-      <div class="pagination" style="text-align: center; margin-top: 50px;">
-        {{ paginate | default_pagination }}
       </div>
-    {% endif %}
+    </div>
   </div>
-{% endpaginate %}
 
-<style>
-  /* Aap wahi CSS reuse kar sakte hain jo upar hero section ke liye thi */
-  .product-grid { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 30px; 
+  {%- comment -%} ── Products grid ── {%- endcomment -%}
+  <div class="sc-main">
+    {%- if collection.products.size > 0 -%}
+      <div
+        class="sc-grid"
+        style="--cols-desk: {{ section.settings.columns_desktop }}; --cols-mob: {{ section.settings.columns_mobile }};"
+      >
+        {%- for product in collection.products -%}
+          <div class="sc-prod-card">
+            <a href="{{ product.url }}" class="sc-prod-card__link" aria-label="{{ product.title }}">
+
+              <div class="sc-prod-card__media">
+                {%- if product.featured_image != blank -%}
+                  {{-
+                    product.featured_image
+                    | image_url: width: 600, format: 'webp'
+                    | image_tag:
+                      class: 'sc-prod-card__img',
+                      alt: product.featured_image.alt | default: product.title,
+                      loading: 'lazy',
+                      width: 600,
+                      height: 600
+                  -}}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'sc-prod-card__placeholder' }}
+                {%- endif -%}
+
+                {%- if product.available == false -%}
+                  <span class="sc-prod-card__badge sc-prod-card__badge--sold">Sold Out</span>
+                {%- elsif product.compare_at_price > product.price -%}
+                  <span class="sc-prod-card__badge sc-prod-card__badge--sale">Sale</span>
+                {%- endif -%}
+              </div>
+
+              <div class="sc-prod-card__body">
+                {%- if product.vendor != blank -%}
+                  <p class="sc-prod-card__vendor">{{ product.vendor }}</p>
+                {%- endif -%}
+                <h2 class="sc-prod-card__title">{{ product.title }}</h2>
+
+                <div class="sc-prod-card__price">
+                  {%- if product.compare_at_price > product.price -%}
+                    <s class="sc-prod-card__price--compare">{{ product.compare_at_price | money }}</s>
+                    <span class="sc-prod-card__price--sale">{{ product.price | money }}</span>
+                  {%- else -%}
+                    <span>{{ product.price | money }}</span>
+                  {%- endif -%}
+                </div>
+              </div>
+
+            </a>
+
+            {%- unless product.available == false -%}
+              <form method="post" action="{{ routes.cart_add_url }}" class="sc-prod-card__form">
+                <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                <button
+                  type="submit"
+                  class="sc-prod-card__atc"
+                  aria-label="Add {{ product.title }} to cart"
+                >
+                  Add to Cart
+                </button>
+              </form>
+            {%- endunless -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        <nav class="sc-pagination" aria-label="Pagination">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}" class="sc-pagination__btn sc-pagination__btn--prev" aria-label="Previous page">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Prev
+            </a>
+          {%- endif -%}
+
+          <div class="sc-pagination__pages">
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}" class="sc-pagination__page">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="sc-pagination__page sc-pagination__page--current" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="sc-pagination__ellipsis">…</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}" class="sc-pagination__btn sc-pagination__btn--next" aria-label="Next page">
+              Next
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+
+    {%- else -%}
+      <div class="sc-empty">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.5" opacity="0.2"/>
+          <path d="M16 24h16M24 16v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        </svg>
+        <p>No products found in this collection.</p>
+        <a href="{{ routes.collections_url }}" class="sc-empty__link">Browse all collections</a>
+      </div>
+    {%- endif -%}
+  </div>
+
+{%- endpaginate -%}
+
+{% stylesheet %}
+  /* ── Hero ── */
+  .sc-hero {
+    position: relative;
+    min-height: 280px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
   }
-  @media (max-width: 768px) {
-    .product-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .sc-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
   }
-</style>
+
+  .sc-hero__bg--plain {
+    background: linear-gradient(135deg, #faf7f4 0%, #f0ebe3 100%);
+  }
+
+  .sc-hero__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sc-hero__bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);
+  }
+
+  .sc-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 2.5rem;
+    color: #fff;
+  }
+
+  .sc-hero--plain .sc-hero__content,
+  .sc-hero__bg--plain ~ .sc-hero__content {
+    color: var(--color-foreground, #1a1a1a);
+  }
+
+  .sc-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    opacity: 0.75;
+    margin-bottom: 0.875rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-hero__bc-link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .sc-hero__bc-link:hover { opacity: 1; }
+
+  .sc-hero__title {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 800;
+    margin: 0 0 0.5rem;
+    line-height: 1.1;
+  }
+
+  .sc-hero__desc {
+    font-size: 1.0625rem;
+    opacity: 0.85;
+    margin: 0 0 0.5rem;
+    max-width: 600px;
+  }
+
+  .sc-hero__count {
+    font-size: 0.875rem;
+    opacity: 0.7;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* ── Toolbar ── */
+  .sc-toolbar {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: var(--color-background, #fff);
+    position: sticky;
+    top: 72px;
+    z-index: 10;
+  }
+
+  .sc-toolbar__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.875rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-toolbar__results {
+    font-size: 0.875rem;
+    color: var(--color-foreground, #1a1a1a);
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  .sc-toolbar__sort {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .sc-toolbar__sort-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .sc-toolbar__sort-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .sc-toolbar__sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--color-background, #fff);
+    border: 1.5px solid rgba(0,0,0,0.14);
+    border-radius: 8px;
+    padding: 0.45rem 2.2rem 0.45rem 0.875rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: var(--color-foreground, #1a1a1a);
+    cursor: pointer;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    min-width: 160px;
+  }
+
+  .sc-toolbar__sort-select:focus {
+    outline: none;
+    border-color: #c49a5e;
+    box-shadow: 0 0 0 3px rgba(196,154,94,0.15);
+  }
+
+  .sc-toolbar__sort-chevron {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* ── Main ── */
+  .sc-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ── Product Grid ── */
+  .sc-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-mob, 2), 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .sc-grid {
+      gap: 1.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sc-grid {
+      grid-template-columns: repeat(var(--cols-desk, 3), 1fr);
+    }
+  }
+
+  /* ── Product Card ── */
+  .sc-prod-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-background, #fff);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.07);
+    transition: transform 0.28s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s ease;
+  }
+
+  .sc-prod-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.11);
+  }
+
+  .sc-prod-card__link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .sc-prod-card__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #f5f2ee;
+    overflow: hidden;
+  }
+
+  .sc-prod-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .sc-prod-card:hover .sc-prod-card__img {
+    transform: scale(1.05);
+  }
+
+  .sc-prod-card__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+  }
+
+  /* Badges */
+  .sc-prod-card__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    line-height: 1;
+  }
+
+  .sc-prod-card__badge--sold {
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+  }
+
+  .sc-prod-card__badge--sale {
+    background: #c49a5e;
+    color: #fff;
+  }
+
+  /* Card body */
+  .sc-prod-card__body {
+    padding: 0.875rem 1rem 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .sc-prod-card__vendor {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #c49a5e;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .sc-prod-card__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.35;
+    color: var(--color-foreground, #1a1a1a);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sc-prod-card__price {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-foreground, #1a1a1a);
+  }
+
+  .sc-prod-card__price--compare {
+    font-size: 0.875rem;
+    font-weight: 400;
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  .sc-prod-card__price--sale {
+    color: #c0392b;
+  }
+
+  /* ATC button */
+  .sc-prod-card__form {
+    padding: 0 1rem 1rem;
+  }
+
+  .sc-prod-card__atc {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s ease, transform 0.18s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .sc-prod-card__atc:hover {
+    background: #c49a5e;
+    transform: translateY(-1px);
+  }
+
+  /* ── Pagination ── */
+  .sc-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .sc-pagination__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid rgba(0,0,0,0.14);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-foreground, #1a1a1a);
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+  }
+
+  .sc-pagination__btn:hover {
+    border-color: #c49a5e;
+    color: #c49a5e;
+    background: rgba(196,154,94,0.07);
+  }
+
+  .sc-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .sc-pagination__page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-foreground, #1a1a1a);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  a.sc-pagination__page:hover {
+    background: rgba(196,154,94,0.1);
+    color: #c49a5e;
+  }
+
+  .sc-pagination__page--current {
+    background: #c49a5e;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .sc-pagination__ellipsis {
+    padding: 0 0.25rem;
+    opacity: 0.4;
+    font-size: 0.875rem;
+  }
+
+  /* ── Empty State ── */
+  .sc-empty {
+    text-align: center;
+    padding: 5rem 1rem;
+    color: var(--color-foreground, #1a1a1a);
+    opacity: 0.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .sc-empty p {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .sc-empty__link {
+    display: inline-block;
+    padding: 0.6rem 1.25rem;
+    border: 1.5px solid currentColor;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-foreground, #1a1a1a);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+  }
+
+  .sc-empty__link:hover { opacity: 0.7; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection Products",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "Products per page",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (Mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Products"
+    }
+  ]
+}
+{% endschema %}
