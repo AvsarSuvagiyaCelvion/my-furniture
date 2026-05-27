@@ -52,7 +52,7 @@
                 data-src="{{ image | image_url: width: 1000, format: 'webp' }}"
                 data-alt="{{ image.alt | escape }}"
               >
-                <img src="{{ image | image_url: width: 120, height: 120, crop: 'center' }}" alt="{{ image.alt }}" loading="lazy">
+                <img src="{{ image | image_url: width: 120, height: 120, crop: 'center' }}" alt="{{ image.alt }}" loading="lazy" width="120" height="120">
               </button>
             {%- endfor -%}
           </div>
