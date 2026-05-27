@@ -11,10 +11,17 @@
   "sections": {
     "main": {
       "type": "page",
+      "disabled": true,
+      "settings": {}
+    },
+    "page_contact_Nwy97g": {
+      "type": "page-contact",
+      "name": "Furniture Pro Contact",
       "settings": {}
     }
   },
   "order": [
-    "main"
+    "main",
+    "page_contact_Nwy97g"
   ]
 }
