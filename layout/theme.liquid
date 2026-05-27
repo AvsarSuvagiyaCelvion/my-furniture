@@ -27,6 +27,39 @@
     {{ content_for_header }}
 
     {{ 'scroll-animations.css' | asset_url | stylesheet_tag }}
+
+    {%- comment -%} Organization JSON-LD — site-wide brand entity signal {%- endcomment -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": "{{ shop.url }}"
+      {%- if settings.logo != blank -%}
+      ,"logo": "{{ settings.logo | image_url: width: 600 }}"
+      {%- endif -%}
+    }
+    </script>
+
+    {%- if request.page_type == 'index' -%}
+    {%- comment -%} WebSite + SearchAction — enables Google sitelinks search box {%- endcomment -%}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "url": "{{ shop.url }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    {%- endif -%}
   </head>
 
   <body>

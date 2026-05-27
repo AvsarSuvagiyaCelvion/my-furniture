@@ -18,7 +18,16 @@
       "Bash(npx -y lighthouse https://woodencraft-xqegpzdo.myshopify.com --output=json --output-path=./tmp/lh-mobile.json '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage')",
       "Bash(npx -y lighthouse https://woodencraft-xqegpzdo.myshopify.com --preset=desktop --output=json --output-path=./tmp/lh-desktop.json '--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage')",
       "Bash(node -e ' *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "PowerShell(shopify theme *)",
+      "Bash(python *)",
+      "Bash(mkdir -p ~/.config/claude-seo)",
+      "Bash(mkdir -p \"C:/Users/hp/.claude/skills/seo-google/scripts\")",
+      "Bash(pip install *)",
+      "PowerShell(cd \"E:\\\\New_furniture\"; $ts = Get-Date -Format \"yyyyMMdd-HHmm\"; $branch = git rev-parse --abbrev-ref HEAD; $name = \"staging-$branch-$ts\"; Write-Host \"Pushing theme: $name\"; shopify theme push --unpublished --json --name=\"$name\" 2>&1)",
+      "PowerShell(cd \"E:\\\\New_furniture\"; $ts = Get-Date -Format \"yyyyMMdd-HHmm\"; $branch = git rev-parse --abbrev-ref HEAD; $themeName = \"staging-$branch-$ts\"; Write-Host \"Pushing theme: $themeName\"; shopify theme push --unpublished --json --theme=\"$themeName\" 2>&1)",
+      "PowerShell(if \\(-not \\(Test-Path \"E:\\\\New_furniture\\\\tmp\"\\)\\) { New-Item -ItemType Directory -Path \"E:\\\\New_furniture\\\\tmp\" })",
+      "PowerShell(cd \"E:\\\\New_furniture\"; $lh = Get-Content ./tmp/lh-staging.json | ConvertFrom-Json; Write-Host \"=== ACCESSIBILITY FAILURES ===\"; $lh.audits.PSObject.Properties | Where-Object { $_.Value.score -ne $null -and $_.Value.score -lt 1 -and $lh.categories.accessibility.auditRefs.id -contains $_.Name } | Select-Object @{N='id';E={$_.Name}}, @{N='score';E={$_.Value.score}}, @{N='title';E={$_.Value.title}} | Format-Table -AutoSize; Write-Host \"=== SEO FAILURES ===\"; $lh.audits.PSObject.Properties | Where-Object { $_.Value.score -ne $null -and $_.Value.score -lt 1 -and $lh.categories.seo.auditRefs.id -contains $_.Name } | Select-Object @{N='id';E={$_.Name}}, @{N='score';E={$_.Value.score}}, @{N='title';E={$_.Value.title}} | Format-Table -AutoSize)"
     ]
   }
 }
