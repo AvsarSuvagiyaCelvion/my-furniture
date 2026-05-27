@@ -1,5 +1,5 @@
-{%- assign collection = collections[section.settings.collection] -%}
-{%- assign limit = 6 -%}
+{%- comment -%} Poore store ki products ko latest date ke hisaab se sort kar rahe hain {%- endcomment -%}
+{%- assign latest_products = collections.all.products | sort: 'published_at' | reverse -%}
 
 <section class="featured-products-slider section-{{ section.id }}">
   <div class="container">
@@ -9,19 +9,17 @@
     </div>
 
     <!-- Swiper Slider Container -->
-    <div class="swiper featured-products-swiper">
+    <div class="swiper latest-products-swiper">
       <div class="swiper-wrapper">
-        {% for product in collection.products limit: limit %}
+        {%- comment -%} Sirf pehli 4 products ka loop {%- endcomment -%}
+        {% for product in latest_products limit: 4 %}
           <div class="swiper-slide">
             <div class="product-card">
               <a href="{{ product.url }}" class="product-link">
                 <div class="product-image-box">
-                  {% if product.available == false %}
-                    <span class="badge sold-out">Sold Out</span>
-                  {% endif %}
-                  {% if product.compare_at_price > product.price %}
-                    <span class="badge sale">Sale</span>
-                  {% endif %}
+                  {%- if product.compare_at_price > product.price -%}
+                    <span class="badge sale">New Drop</span>
+                  {%- endif -%}
 
                   <img
                     class="primary-img"
@@ -29,6 +27,7 @@
                     alt="{{ product.title }}"
                     loading="lazy"
                   >
+
                   {% if product.images.size > 1 %}
                     <img
                       class="secondary-img"
@@ -39,7 +38,7 @@
                   {% endif %}
 
                   <div class="quick-add">
-                    <span>+ Quick View</span>
+                    <span>View Detail</span>
                   </div>
                 </div>
 
@@ -55,79 +54,67 @@
               </a>
             </div>
           </div>
-        {% else %}
-          {% for i in (1..6) %}
-            <div class="swiper-slide">
-              <div class="product-card">
-                {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
-                <p>Product Title {{ i }}</p>
-                <p>{{ 1999 | money }}</p>
-              </div>
-            </div>
-          {% endfor %}
         {% endfor %}
       </div>
 
       <!-- Navigation Arrows -->
       <div class="swiper-button-next custom-nav"></div>
       <div class="swiper-button-prev custom-nav"></div>
-      <!-- Pagination dots -->
-      <div class="swiper-pagination"></div>
     </div>
   </div>
 </section>
 
-<!-- Include Swiper.js & CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <style>
   .featured-products-slider {
-    padding: 80px 0;
+    padding: 100px 0;
     background: #fff;
-    overflow: hidden;
   }
   .container {
-    max-width: 1300px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     position: relative;
   }
 
   .section-header {
-    text-align: center;
-    margin-bottom: 50px;
+    text-align: left;
+    margin-bottom: 40px;
+    border-left: 5px solid #222;
+    padding-left: 20px;
   }
   .section-header .title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    color: #222;
+    font-size: 2.8rem;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -1px;
   }
   .section-header .subtitle {
-    color: #777;
+    color: #888;
+    margin-top: 5px;
     font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
   }
 
   .product-card {
+    background: #fff;
     position: relative;
-    transition: all 0.3s ease;
+    overflow: hidden;
   }
   .product-image-box {
     position: relative;
-    aspect-ratio: 4/5;
+    aspect-ratio: 1/1;
     overflow: hidden;
-    background: #f5f5f5;
-    border-radius: 8px;
+    background: #f9f9f9;
+    border-radius: 4px;
   }
 
   .product-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: 0.6s ease;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
   .secondary-img {
     position: absolute;
@@ -140,46 +127,44 @@
     opacity: 1;
   }
   .product-card:hover .primary-img {
-    transform: scale(1.1);
+    transform: scale(1.08);
   }
 
-  /* Quick View Button */
   .quick-add {
     position: absolute;
-    bottom: -50px;
-    left: 0;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    text-align: center;
-    transition: 0.4s;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.8rem;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #222;
+    color: #fff;
+    padding: 12px 25px;
+    white-space: nowrap;
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
   .product-card:hover .quick-add {
-    bottom: 0;
+    transform: translateX(-50%) translateY(0);
   }
 
   .product-info {
     padding: 20px 0;
-    text-align: left;
   }
   .product-title {
     font-size: 1.1rem;
-    margin: 0 0 8px;
-    color: #333;
-    text-decoration: none;
-    font-weight: 500;
+    margin-bottom: 8px;
+    color: #111;
+    font-weight: 600;
   }
   .product-price {
-    font-size: 1rem;
-    color: #222;
+    font-size: 1.2rem;
+    color: #444;
   }
   .old-price {
     text-decoration: line-through;
-    color: #999;
-    margin-left: 10px;
+    color: #bbb;
+    margin-left: 8px;
     font-size: 0.9rem;
   }
 
@@ -187,55 +172,56 @@
     position: absolute;
     top: 15px;
     left: 15px;
-    padding: 5px 12px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    z-index: 2;
-    border-radius: 20px;
+    background: #000;
     color: #fff;
-  }
-  .sale {
-    background: #e74c3c;
-  }
-  .sold-out {
-    background: #222;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    z-index: 2;
+    text-transform: uppercase;
   }
 
-  /* Navigation Styling */
   .custom-nav {
-    color: #222 !important;
-    width: 40px !important;
-    height: 40px !important;
     background: #fff;
+    width: 50px !important;
+    height: 50px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    top: 40% !important;
   }
   .custom-nav::after {
-    font-size: 1rem !important;
-    font-weight: bold;
+    font-size: 1.2rem !important;
+    color: #000;
+  }
+  .swiper-button-next {
+    right: -10px !important;
+  }
+  .swiper-button-prev {
+    left: -10px !important;
   }
 
-  .swiper-pagination-bullet-active {
-    background: #222 !important;
+  @media (max-width: 768px) {
+    .section-header .title {
+      font-size: 2rem;
+    }
+    .custom-nav {
+      display: none;
+    }
   }
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    new Swiper('.featured-products-swiper', {
-      slidesPerView: 1,
+    new Swiper('.latest-products-swiper', {
+      slidesPerView: 1.2,
       spaceBetween: 20,
-      loop: true,
+      centeredSlides: false,
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       },
-      pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-      },
       breakpoints: {
-        640: { slidesPerView: 2 },
+        640: { slidesPerView: 2.2 },
         1024: { slidesPerView: 3 },
         1200: { slidesPerView: 4 },
       },
@@ -245,29 +231,24 @@
 
 {% schema %}
 {
-  "name": "Featured Products Slider",
+  "name": "Latest 4 Products Slider",
   "settings": [
     {
       "type": "text",
       "id": "title",
       "label": "Heading",
-      "default": "New Arrivals"
+      "default": "Latest Collection"
     },
     {
       "type": "text",
       "id": "subtitle",
       "label": "Subheading",
-      "default": "Minimalist Furniture Collection"
-    },
-    {
-      "id": "collection",
-      "type": "collection",
-      "label": "Select Collection"
+      "default": "Just added to our store"
     }
   ],
   "presets": [
     {
-      "name": "Featured Products Slider"
+      "name": "Latest 4 Products Slider"
     }
   ]
 }
