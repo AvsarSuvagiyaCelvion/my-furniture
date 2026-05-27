@@ -7,7 +7,11 @@
       "Bash(Test-Path *)",
       "PowerShell(Remove-Item \"e:\\\\New_furniture\\\\sections\\\\list-collections.liquid\" -Confirm:$false)",
       "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css\" -o swiper-bundle.min.css)",
-      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js\" -o swiper-bundle.min.js)"
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js\" -o swiper-bundle.min.js)",
+      "Bash(npm run *)",
+      "Bash(python -c ' *)",
+      "Bash(grep -rn \"shpat_[a-zA-Z0-9_-]\\\\{10,\\\\}\\\\|sk-[a-zA-Z0-9]\\\\{30,\\\\}\\\\|AKIA[A-Z0-9]\\\\{16\\\\}\\\\|ghp_[a-zA-Z0-9]\\\\{36\\\\}\" --include=\"*.liquid\" --include=\"*.js\" .)",
+      "Bash(npx playwright *)"
     ]
   }
 }
