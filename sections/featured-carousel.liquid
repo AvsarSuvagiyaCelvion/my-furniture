@@ -11,8 +11,7 @@
     <!-- Swiper Slider Container -->
     <div class="swiper latest-products-swiper">
       <div class="swiper-wrapper">
-        {%- comment -%} Sirf pehli 4 products ka loop {%- endcomment -%}
-        {% for product in latest_products limit: 4 %}
+        {% for product in latest_products limit: 8 %}
           <div class="swiper-slide">
             <div class="product-card">
               <a href="{{ product.url }}" class="product-link">
@@ -24,24 +23,14 @@
                   {{-
                     product.featured_image
                     | image_url: width: 600, format: 'webp'
-                    | image_tag:
-                      class: 'primary-img',
-                      alt: product.title,
-                      loading: 'lazy',
-                      width: 600,
-                      height: 600
+                    | image_tag: class: 'primary-img', alt: product.title, loading: 'lazy', width: 600, height: 600
                   -}}
 
                   {%- if product.images.size > 1 -%}
                     {{-
                       product.images[1]
                       | image_url: width: 600, format: 'webp'
-                      | image_tag:
-                        class: 'secondary-img',
-                        alt: product.title,
-                        loading: 'lazy',
-                        width: 600,
-                        height: 600
+                      | image_tag: class: 'secondary-img', alt: product.title, loading: 'lazy', width: 600, height: 600
                     -}}
                   {%- endif -%}
 
@@ -68,6 +57,9 @@
       <!-- Navigation Arrows -->
       <div class="swiper-button-next custom-nav"></div>
       <div class="swiper-button-prev custom-nav"></div>
+
+      <!-- Pagination Dots (Optional: Professional look ke liye add kiya hai) -->
+      <div class="swiper-pagination"></div>
     </div>
   </div>
 </section>
@@ -77,7 +69,7 @@
 
 <style>
   .featured-products-slider {
-    padding: 100px 0;
+    padding: 80px 0;
     background: #fff;
   }
   .container {
@@ -94,14 +86,12 @@
     padding-left: 20px;
   }
   .section-header .title {
-    font-size: 2.8rem;
+    font-size: 2.5rem;
     margin: 0;
     font-weight: 800;
-    letter-spacing: -1px;
   }
   .section-header .subtitle {
     color: #888;
-    margin-top: 5px;
     font-size: 1rem;
   }
 
@@ -117,12 +107,11 @@
     background: #f9f9f9;
     border-radius: 4px;
   }
-
   .product-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: 0.8s ease;
   }
   .secondary-img {
     position: absolute;
@@ -130,7 +119,6 @@
     left: 0;
     opacity: 0;
   }
-
   .product-card:hover .secondary-img {
     opacity: 1;
   }
@@ -145,28 +133,27 @@
     transform: translateX(-50%) translateY(100px);
     background: #222;
     color: #fff;
-    padding: 12px 25px;
-    white-space: nowrap;
-    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    padding: 10px 20px;
+    transition: 0.4s;
     font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 1px;
   }
   .product-card:hover .quick-add {
     transform: translateX(-50%) translateY(0);
   }
 
   .product-info {
-    padding: 20px 0;
+    padding: 15px 0;
   }
   .product-title {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin-bottom: 5px;
     color: #111;
     font-weight: 600;
+    text-decoration: none;
   }
   .product-price {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #444;
   }
   .old-price {
@@ -176,41 +163,31 @@
     font-size: 0.9rem;
   }
 
-  .badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: #000;
-    color: #fff;
-    padding: 4px 12px;
-    font-size: 10px;
-    font-weight: 700;
-    z-index: 2;
-    text-transform: uppercase;
-  }
-
   .custom-nav {
     background: #fff;
-    width: 50px !important;
-    height: 50px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 45px !important;
+    height: 45px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    top: 40% !important;
   }
   .custom-nav::after {
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
     color: #000;
+    font-weight: bold;
   }
-  .swiper-button-next {
-    right: -10px !important;
+
+  /* Dots styling */
+  .swiper-pagination {
+    position: relative;
+    margin-top: 30px;
   }
-  .swiper-button-prev {
-    left: -10px !important;
+  .swiper-pagination-bullet-active {
+    background: #222 !important;
   }
 
   @media (max-width: 768px) {
     .section-header .title {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
     .custom-nav {
       display: none;
@@ -220,26 +197,42 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    new Swiper('.latest-products-swiper', {
-      slidesPerView: 1.2,
-      spaceBetween: 20,
-      centeredSlides: false,
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-      breakpoints: {
-        640: { slidesPerView: 2.2 },
-        1024: { slidesPerView: 3 },
-        1200: { slidesPerView: 4 },
-      },
-    });
+    // Check if Swiper is loaded
+    const initSwiper = () => {
+      new Swiper('.latest-products-swiper', {
+        slidesPerView: 1.2,
+        spaceBetween: 20,
+        grabCursor: true,
+        loop: false, // 6 products ke liye false behtar hai agar slidesPerView 4 hai
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          640: { slidesPerView: 2.2 },
+          1024: { slidesPerView: 3 },
+          1200: { slidesPerView: 4 }, // Desktop par 4 dikhenge, baki 2 slide karne par aayenge
+        },
+      });
+    };
+
+    // Delay to ensure swiper-bundle.min.js is ready
+    if (typeof Swiper === 'undefined') {
+      const script = document.querySelector('script[src*="swiper-bundle.min.js"]');
+      script.addEventListener('load', initSwiper);
+    } else {
+      initSwiper();
+    }
   });
 </script>
 
 {% schema %}
 {
-  "name": "Latest 4 Products Slider",
+  "name": "Latest 6 Products Slider",
   "settings": [
     {
       "type": "text",
@@ -256,7 +249,7 @@
   ],
   "presets": [
     {
-      "name": "Latest 4 Products Slider"
+      "name": "Latest 6 Products Slider"
     }
   ]
 }

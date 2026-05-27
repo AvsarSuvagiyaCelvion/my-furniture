@@ -1,0 +1,146 @@
+<section
+  class="marquee-section"
+  style="background-color: {{ section.settings.bg_color }}; color: {{ section.settings.text_color }};"
+>
+  <div class="marquee-wrapper">
+    <div class="marquee-content">
+      {%- capture marquee_text -%}
+        <span class="marquee-item">PREMIUM QUALITY FURNITURE</span>
+        <span class="marquee-sep">★</span>
+        <span class="marquee-item">HANDCRAFTED WITH LOVE</span>
+        <span class="marquee-sep">★</span>
+        <span class="marquee-item">MODERN AESTHETICS</span>
+        <span class="marquee-sep">★</span>
+        <span class="marquee-item">SOLID TEAK WOOD</span>
+        <span class="marquee-sep">★</span>
+        <span class="marquee-item">FREE PAN-INDIA SHIPPING</span>
+        <span class="marquee-sep">★</span>
+        <span class="marquee-item">SUSTAINABLE MATERIALS</span>
+        <span class="marquee-sep">★</span>
+      {%- endcapture -%}
+
+      <!-- Text ko repeat kiya gaya hai taaki loop continuous lage -->
+      <div class="marquee-track">
+        {{ marquee_text -}}
+        {{- marquee_text -}}
+        {{- marquee_text -}}
+        {{- marquee_text }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee-section {
+    padding: 15px 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    user-select: none;
+    {% if section.settings.show_gradient %}
+    background: linear-gradient(90deg, {{ section.settings.bg_color }}, {{ section.settings.accent_color }}, {{ section.settings.bg_color }});
+    {% endif %}
+  }
+
+  .marquee-wrapper {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee-scroll {{ section.settings.speed }}s linear infinite;
+  }
+
+  /* Hover par marquee ruk jayegi - Professional Touch */
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .marquee-item {
+    font-family: 'Playfair Display', serif; /* Furniture ke liye elegant font */
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .marquee-sep {
+    font-size: 20px;
+    color: {{ section.settings.accent_color }};
+    display: flex;
+    align-items: center;
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 768px) {
+    .marquee-item { font-size: 16px; padding: 0 20px; }
+    .marquee-section { padding: 10px 0; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Furniture Marquee",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Star/Accent Color",
+      "default": "#c49a5e"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gradient",
+      "label": "Show Gradient Background",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll Speed (Lower is faster)",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Furniture Marquee"
+    }
+  ]
+}
+{% endschema %}
