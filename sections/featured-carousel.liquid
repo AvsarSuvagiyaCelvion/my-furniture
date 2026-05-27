@@ -21,21 +21,29 @@
                     <span class="badge sale">New Drop</span>
                   {%- endif -%}
 
-                  <img
-                    class="primary-img"
-                    src="{{ product.featured_image | img_url: '600x' }}"
-                    alt="{{ product.title }}"
-                    loading="lazy"
-                  >
+                  {{-
+                    product.featured_image
+                    | image_url: width: 600, format: 'webp'
+                    | image_tag:
+                      class: 'primary-img',
+                      alt: product.title,
+                      loading: 'lazy',
+                      width: 600,
+                      height: 600
+                  -}}
 
-                  {% if product.images.size > 1 %}
-                    <img
-                      class="secondary-img"
-                      src="{{ product.images[1] | img_url: '600x' }}"
-                      alt="{{ product.title }}"
-                      loading="lazy"
-                    >
-                  {% endif %}
+                  {%- if product.images.size > 1 -%}
+                    {{-
+                      product.images[1]
+                      | image_url: width: 600, format: 'webp'
+                      | image_tag:
+                        class: 'secondary-img',
+                        alt: product.title,
+                        loading: 'lazy',
+                        width: 600,
+                        height: 600
+                    -}}
+                  {%- endif -%}
 
                   <div class="quick-add">
                     <span>View Detail</span>
@@ -64,8 +72,8 @@
   </div>
 </section>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+{{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer></script>
 
 <style>
   .featured-products-slider {

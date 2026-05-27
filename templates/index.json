@@ -19,7 +19,8 @@
       "name": "t:general.split_hero",
       "settings": {
         "eyebrow": "Why choose us",
-        "heading": "Beyond Furniture\nCreating A Lifestyle",
+        "heading_static": "Beyond Furniture",
+        "typewriter_words": "Creating Lifestyle, Modern Design, Quality Comfort",
         "description": "With thousands of satisfied customers, we are a trusted name in quality furniture. Our thoughtfully designed pieces bring comfort, style, and functionality to every home. Experience the difference today!",
         "cta_label": "Learn more",
         "cta_url": "",
@@ -105,12 +106,21 @@
         "icon_color": "#c49a5e",
         "section_background": "warm"
       }
+    },
+    "featured_carousel_LrhTXm": {
+      "type": "featured-carousel",
+      "name": "Latest 4 Products Slider",
+      "settings": {
+        "title": "Latest Collection",
+        "subtitle": "Just added to our store"
+      }
     }
   },
   "order": [
     "main",
     "split_hero_NCdKnk",
     "collections_showcase_tNVQ6d",
-    "why_choose_us_RYVPmx"
+    "why_choose_us_RYVPmx",
+    "featured_carousel_LrhTXm"
   ]
 }

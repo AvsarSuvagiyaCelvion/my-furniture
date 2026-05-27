@@ -5,7 +5,9 @@
       "Bash(dir sections\\\\customer-reviews.liquid)",
       "Bash(dir assets\\\\critical.css)",
       "Bash(Test-Path *)",
-      "PowerShell(Remove-Item \"e:\\\\New_furniture\\\\sections\\\\list-collections.liquid\" -Confirm:$false)"
+      "PowerShell(Remove-Item \"e:\\\\New_furniture\\\\sections\\\\list-collections.liquid\" -Confirm:$false)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css\" -o swiper-bundle.min.css)",
+      "Bash(curl -sL \"https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js\" -o swiper-bundle.min.js)"
     ]
   }
 }

@@ -1,0 +1,799 @@
+{%- comment -%} ── All Products Page ──────────────────────────── {%- endcomment -%}
+
+{%- paginate collections.all.products by section.settings.products_per_page -%}
+
+  {%- comment -%} ── HERO ── {%- endcomment -%}
+  <div class="pp-hero">
+    <div class="pp-hero__content">
+      <nav class="pp-hero__breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ routes.root_url }}" class="pp-hero__bc-link">Home</a>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span aria-current="page">{{ section.settings.title | default: 'All Products' }}</span>
+      </nav>
+
+      <h1 class="pp-hero__title">{{ section.settings.title | default: 'All Products' }}</h1>
+
+      {%- if section.settings.subtitle != blank -%}
+        <p class="pp-hero__subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+
+      <div class="pp-hero__meta">
+        <span class="pp-hero__badge">{{ collections.all.products_count }} Products</span>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} ── COLLECTION FILTER PILLS ── {%- endcomment -%}
+  {%- if section.settings.show_collection_filter -%}
+    <div class="pp-filters">
+      <div class="pp-filters__inner">
+        <a
+          href="{{ page.url }}"
+          class="pp-filter-pill{% if request.path == page.url %} is-active{% endif %}"
+        >All</a>
+        {%- for coll in collections -%}
+          {%- unless coll.handle == 'frontpage' or coll.handle == 'all' -%}
+            <a
+              href="{{ coll.url }}"
+              class="pp-filter-pill"
+            >{{ coll.title }}</a>
+          {%- endunless -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} ── TOOLBAR ── {%- endcomment -%}
+  <div class="pp-toolbar">
+    <div class="pp-toolbar__inner">
+      <p class="pp-toolbar__count" aria-live="polite">
+        Showing
+        <strong>{{ paginate.current_offset | plus: 1 }}–{{ paginate.current_offset | plus: collections.all.products.size }}</strong>
+        of <strong>{{ collections.all.products_count }}</strong> products
+      </p>
+
+      <div class="pp-toolbar__sort">
+        <label for="pp-sort" class="pp-toolbar__sort-label">Sort</label>
+        <div class="pp-sort-wrap">
+          <select
+            id="pp-sort"
+            class="pp-sort-select"
+            onchange="window.location.href = this.value"
+            aria-label="Sort products"
+          >
+            <option value="{{ page.url }}">Featured</option>
+            <option value="{{ page.url }}?sort=price-asc" {% if request.path contains 'price-asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="{{ page.url }}?sort=price-desc" {% if request.path contains 'price-desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="{{ page.url }}?sort=title-asc" {% if request.path contains 'title-asc' %}selected{% endif %}>Name: A–Z</option>
+            <option value="{{ page.url }}?sort=title-desc" {% if request.path contains 'title-desc' %}selected{% endif %}>Name: Z–A</option>
+          </select>
+          <svg class="pp-sort-chevron" width="11" height="7" viewBox="0 0 11 7" fill="none" aria-hidden="true">
+            <path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} ── PRODUCTS GRID ── {%- endcomment -%}
+  <main class="pp-main" id="products-grid">
+    {%- if collections.all.products.size > 0 -%}
+
+      <div
+        class="pp-grid"
+        style="--cols-desk:{{ section.settings.columns_desktop }};--cols-mob:{{ section.settings.columns_mobile }};"
+      >
+        {%- for product in collections.all.products -%}
+          <article class="pp-card" aria-label="{{ product.title }}">
+
+            {%- comment -%} Image + overlay {%- endcomment -%}
+            <a href="{{ product.url }}" class="pp-card__media-link" tabindex="-1" aria-hidden="true">
+              <div class="pp-card__media">
+
+                {%- if product.featured_image != blank -%}
+                  {{-
+                    product.featured_image
+                    | image_url: width: 700, format: 'webp'
+                    | image_tag:
+                      class: 'pp-card__img',
+                      alt: product.featured_image.alt | default: product.title,
+                      loading: 'lazy',
+                      width: 700,
+                      height: 700
+                  -}}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'pp-card__img pp-card__img--placeholder' }}
+                {%- endif -%}
+
+                {%- if product.images.size > 1 -%}
+                  {{-
+                    product.images[1]
+                    | image_url: width: 700, format: 'webp'
+                    | image_tag:
+                      class: 'pp-card__img pp-card__img--hover',
+                      alt: product.title,
+                      loading: 'lazy',
+                      width: 700,
+                      height: 700
+                  -}}
+                {%- endif -%}
+
+                {%- comment -%} Badges {%- endcomment -%}
+                <div class="pp-card__badges">
+                  {%- if product.available == false -%}
+                    <span class="pp-card__badge pp-card__badge--sold">Sold Out</span>
+                  {%- elsif product.compare_at_price > product.price -%}
+                    {%- assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+                    <span class="pp-card__badge pp-card__badge--sale">-{{ discount }}%</span>
+                  {%- elsif product.tags contains 'new' or product.tags contains 'New' -%}
+                    <span class="pp-card__badge pp-card__badge--new">New</span>
+                  {%- endif -%}
+                </div>
+
+                {%- comment -%} Hover overlay {%- endcomment -%}
+                <div class="pp-card__overlay" aria-hidden="true">
+                  <div class="pp-card__overlay-inner">
+                    {%- if product.vendor != blank -%}
+                      <p class="pp-card__vendor">{{ product.vendor }}</p>
+                    {%- endif -%}
+                    <h2 class="pp-card__overlay-title">{{ product.title }}</h2>
+                    <div class="pp-card__overlay-price">
+                      {%- if product.compare_at_price > product.price -%}
+                        <s class="pp-card__price-was">{{ product.compare_at_price | money }}</s>
+                        <span class="pp-card__price-now pp-card__price-now--sale">{{ product.price | money }}</span>
+                      {%- else -%}
+                        <span class="pp-card__price-now">{{ product.price | money }}</span>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </a>
+
+            {%- comment -%} Card footer {%- endcomment -%}
+            <div class="pp-card__foot">
+              <div class="pp-card__foot-info">
+                <a href="{{ product.url }}" class="pp-card__foot-title">{{ product.title }}</a>
+                <div class="pp-card__foot-price">
+                  {%- if product.compare_at_price > product.price -%}
+                    <s class="pp-card__foot-was">{{ product.compare_at_price | money }}</s>
+                    <span class="pp-card__foot-sale">{{ product.price | money }}</span>
+                  {%- else -%}
+                    <span>{{ product.price | money }}</span>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              {%- unless product.available == false -%}
+                <form method="post" action="{{ routes.cart_add_url }}" class="pp-card__atc-form">
+                  <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+                  <button
+                    type="submit"
+                    class="pp-card__atc"
+                    aria-label="Add {{ product.title }} to cart"
+                  >
+                    <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+                      <path d="M1 1h2.5l1.6 7.5h7.8l1.3-5H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="7" cy="14.5" r="1" fill="currentColor"/>
+                      <circle cx="12" cy="14.5" r="1" fill="currentColor"/>
+                    </svg>
+                    <span>Add to Cart</span>
+                  </button>
+                </form>
+              {%- else -%}
+                <span class="pp-card__sold">Sold Out</span>
+              {%- endunless -%}
+            </div>
+
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%} ── Pagination ── {%- endcomment -%}
+      {%- if paginate.pages > 1 -%}
+        <nav class="pp-pagination" aria-label="Products pages">
+          {%- if paginate.previous -%}
+            <a href="{{ paginate.previous.url }}" class="pp-pagination__arrow" aria-label="Previous page">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          {%- else -%}
+            <span class="pp-pagination__arrow pp-pagination__arrow--disabled">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          {%- endif -%}
+
+          <div class="pp-pagination__pages">
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}" class="pp-pagination__page">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="pp-pagination__page pp-pagination__page--active" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="pp-pagination__ellipsis">…</span>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.next -%}
+            <a href="{{ paginate.next.url }}" class="pp-pagination__arrow" aria-label="Next page">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          {%- else -%}
+            <span class="pp-pagination__arrow pp-pagination__arrow--disabled">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 4l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          {%- endif -%}
+        </nav>
+      {%- endif -%}
+
+    {%- else -%}
+      <div class="pp-empty">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+          <circle cx="28" cy="28" r="26" stroke="#c49a5e" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <path d="M20 28h16M28 20v16" stroke="#c49a5e" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h2 class="pp-empty__title">No products found</h2>
+        <p class="pp-empty__text">Check back soon — new items are on the way.</p>
+      </div>
+    {%- endif -%}
+  </main>
+
+{%- endpaginate -%}
+
+{% stylesheet %}
+
+  /* ════════════════════════════════════════
+     HERO
+  ════════════════════════════════════════ */
+  .pp-hero {
+    background: linear-gradient(135deg, #1a1206 0%, #3d2a0e 50%, #5c3d18 100%);
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pp-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(196,154,94,0.15) 0%, transparent 60%),
+                      radial-gradient(circle at 80% 20%, rgba(196,154,94,0.08) 0%, transparent 50%);
+  }
+
+  .pp-hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    color: #fff;
+  }
+
+  .pp-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pp-hero__bc-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .pp-hero__bc-link:hover { color: #c49a5e; }
+
+  .pp-hero__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.75rem;
+    color: #fff;
+  }
+
+  .pp-hero__subtitle {
+    font-size: 1.0625rem;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 1.25rem;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  .pp-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 1rem;
+    background: rgba(196,154,94,0.2);
+    border: 1px solid rgba(196,154,94,0.5);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #e8c27a;
+    letter-spacing: 0.03em;
+  }
+
+  /* ════════════════════════════════════════
+     COLLECTION FILTER PILLS
+  ════════════════════════════════════════ */
+  .pp-filters {
+    background: #faf7f4;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .pp-filters__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .pp-filters__inner::-webkit-scrollbar { display: none; }
+
+  .pp-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 1rem;
+    background: #fff;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #444;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+    flex-shrink: 0;
+  }
+
+  .pp-filter-pill:hover,
+  .pp-filter-pill.is-active {
+    border-color: #c49a5e;
+    background: #c49a5e;
+    color: #fff;
+  }
+
+  /* ════════════════════════════════════════
+     TOOLBAR
+  ════════════════════════════════════════ */
+  .pp-toolbar {
+    position: sticky;
+    top: 72px;
+    z-index: 20;
+    background: rgba(255,255,255,0.93);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  .pp-toolbar__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pp-toolbar__count {
+    font-size: 0.875rem;
+    color: #777;
+    margin: 0;
+  }
+
+  .pp-toolbar__count strong {
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  .pp-toolbar__sort { display: flex; align-items: center; gap: 0.6rem; }
+
+  .pp-toolbar__sort-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .pp-sort-wrap { position: relative; }
+
+  .pp-sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+    padding: 0.5rem 2.25rem 0.5rem 0.9rem;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: #1a1a1a;
+    cursor: pointer;
+    min-width: 180px;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .pp-sort-select:focus {
+    outline: none;
+    border-color: #c49a5e;
+    box-shadow: 0 0 0 3px rgba(196,154,94,0.18);
+  }
+
+  .pp-sort-chevron {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #888;
+  }
+
+  /* ════════════════════════════════════════
+     MAIN + GRID
+  ════════════════════════════════════════ */
+  .pp-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  .pp-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-mob, 2), 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) { .pp-grid { gap: 1.25rem; } }
+
+  @media (min-width: 1024px) {
+    .pp-grid {
+      grid-template-columns: repeat(var(--cols-desk, 4), 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  /* ════════════════════════════════════════
+     CARD
+  ════════════════════════════════════════ */
+  .pp-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  }
+
+  .pp-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(196,154,94,0.1);
+  }
+
+  .pp-card__media-link { display: block; text-decoration: none; }
+
+  .pp-card__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f5f0ea;
+  }
+
+  .pp-card__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease;
+  }
+
+  .pp-card__img--placeholder { opacity: 0.2; }
+
+  .pp-card__img--hover { opacity: 0; z-index: 1; }
+
+  .pp-card:hover .pp-card__img--hover { opacity: 1; }
+  .pp-card:hover .pp-card__img:not(.pp-card__img--hover) { transform: scale(1.07); }
+
+  /* Badges */
+  .pp-card__badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .pp-card__badge {
+    display: inline-block;
+    padding: 0.22rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .pp-card__badge--sale { background: #c49a5e; color: #fff; }
+  .pp-card__badge--sold { background: rgba(0,0,0,0.72); color: #fff; }
+  .pp-card__badge--new  { background: #2d6a4f; color: #fff; }
+
+  /* Hover overlay */
+  .pp-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.25rem;
+    background: linear-gradient(to top, rgba(14,8,0,0.82) 0%, rgba(14,8,0,0.45) 45%, transparent 75%);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    pointer-events: none;
+  }
+
+  .pp-card:hover .pp-card__overlay { opacity: 1; transform: translateY(0); }
+
+  .pp-card__overlay-inner { display: flex; flex-direction: column; gap: 0.2rem; }
+
+  .pp-card__vendor {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c49a5e;
+    margin: 0;
+  }
+
+  .pp-card__overlay-title {
+    font-size: 0.975rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+    color: #fff;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .pp-card__overlay-price { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; }
+  .pp-card__price-now { font-size: 1rem; font-weight: 700; color: #fff; }
+  .pp-card__price-now--sale { color: #f0c070; }
+  .pp-card__price-was { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-decoration: line-through; font-weight: 400; }
+
+  /* Card footer */
+  .pp-card__foot {
+    padding: 0.875rem 1rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .pp-card__foot-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
+
+  .pp-card__foot-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    transition: color 0.15s;
+  }
+
+  .pp-card__foot-title:hover { color: #c49a5e; }
+
+  .pp-card__foot-price {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .pp-card__foot-was { font-size: 0.8rem; font-weight: 400; color: #bbb; text-decoration: line-through; }
+  .pp-card__foot-sale { color: #c0392b; }
+
+  .pp-card__atc-form { flex-shrink: 0; }
+
+  .pp-card__atc {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.9rem;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .pp-card__atc:hover {
+    background: #c49a5e;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(196,154,94,0.35);
+  }
+
+  .pp-card__sold { font-size: 0.8rem; font-weight: 600; color: #aaa; white-space: nowrap; }
+
+  @media (max-width: 480px) {
+    .pp-card__atc span { display: none; }
+    .pp-card__atc { padding: 0.55rem; }
+  }
+
+  /* ════════════════════════════════════════
+     PAGINATION
+  ════════════════════════════════════════ */
+  .pp-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    margin-top: 3.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pp-pagination__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: border-color 0.18s, background 0.18s, color 0.18s;
+  }
+
+  .pp-pagination__arrow:hover {
+    border-color: #c49a5e;
+    color: #c49a5e;
+    background: rgba(196,154,94,0.08);
+  }
+
+  .pp-pagination__arrow--disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+  .pp-pagination__pages { display: flex; align-items: center; gap: 0.25rem; margin: 0 0.25rem; }
+
+  .pp-pagination__page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: #1a1a1a;
+    border: 1.5px solid transparent;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+
+  a.pp-pagination__page:hover {
+    border-color: rgba(196,154,94,0.4);
+    color: #c49a5e;
+    background: rgba(196,154,94,0.07);
+  }
+
+  .pp-pagination__page--active {
+    background: #c49a5e;
+    color: #fff;
+    font-weight: 700;
+    border-color: #c49a5e;
+  }
+
+  .pp-pagination__ellipsis { padding: 0 0.25rem; color: #aaa; font-size: 0.9rem; }
+
+  /* ════════════════════════════════════════
+     EMPTY STATE
+  ════════════════════════════════════════ */
+  .pp-empty {
+    text-align: center;
+    padding: 5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pp-empty__title { font-size: 1.5rem; font-weight: 700; color: #1a1a1a; margin: 0; }
+  .pp-empty__text { font-size: 1rem; color: #888; margin: 0; }
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "All Products Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page Heading",
+      "default": "All Products"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Explore our complete furniture collection."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_collection_filter",
+      "label": "Show collection filter pills",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "Products per page",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "Columns (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Columns (Mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    }
+  ],
+  "presets": [
+    {
+      "name": "All Products Page"
+    }
+  ]
+}
+{% endschema %}
