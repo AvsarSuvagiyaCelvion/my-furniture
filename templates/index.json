@@ -32,6 +32,18 @@
         "accent_color": "#c49a5e"
       }
     },
+    "marquee_text_EQBfGb": {
+      "type": "marquee-text",
+      "name": "Furniture Marquee",
+      "settings": {
+        "bg_color": "#111111",
+        "text_color": "#ffffff",
+        "accent_color": "#c49a5e",
+        "show_gradient": false,
+        "font_size": 20,
+        "speed": 30
+      }
+    },
     "collections_showcase_tNVQ6d": {
       "type": "collections-showcase",
       "name": "t:general.collections_showcase",
@@ -119,6 +131,7 @@
   "order": [
     "main",
     "split_hero_NCdKnk",
+    "marquee_text_EQBfGb",
     "collections_showcase_tNVQ6d",
     "why_choose_us_RYVPmx",
     "featured_carousel_LrhTXm"

@@ -1,0 +1,243 @@
+{% comment %}
+  Professional Contact Page for Furniture Website
+  Design: Minimal, Elegant, Premium
+{% endcomment %}
+
+<section class="furniture-contact-section">
+  <div class="contact-hero">
+    <div class="hero-overlay">
+      <h1>Get In Touch</h1>
+      <p>Aapke sapno ke ghar ko sajane ke liye humse baat karein.</p>
+    </div>
+  </div>
+
+  <div class="contact-container">
+    <div class="contact-grid">
+      
+      <!-- Left Side: Contact Information -->
+      <div class="contact-sidebar">
+        <div class="info-card">
+          <div class="info-item">
+            <span class="icon">📍</span>
+            <div class="text">
+              <h3>Headquarters</h3>
+              <p>Plot 45, Furniture District, Kirti Nagar Industrial Area, New Delhi - 110015</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="icon">📞</span>
+            <div class="text">
+              <h3>Call Us</h3>
+              <p>+91 98765 43210<br>+91 11 2345 6789</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="icon">✉️</span>
+            <div class="text">
+              <h3>Email Support</h3>
+              <p>concierge@furniturelux.com<br>sales@furniturelux.com</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="icon">⏰</span>
+            <div class="text">
+              <h3>Business Hours</h3>
+              <p>Mon - Sat: 10:00 AM - 07:30 PM<br>Sunday: By Appointment Only</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="social-links">
+          <p>Follow Our Journey</p>
+          <div class="social-icons">
+            <a href="#">Instagram</a> | <a href="#">Pinterest</a> | <a href="#">Facebook</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Contact Form -->
+      <div class="contact-main">
+        <div class="form-wrapper">
+          <h2>Send Us a Message</h2>
+          <p>Chahe aapko custom sofa chahiye ya bulk interior inquiry, hum haazir hain.</p>
+
+          {% form 'contact' %}
+            {% if form.posted_successfully? %}
+              <div class="form-alert success">
+                Aapka message bhej diya gaya hai. Hamari team 24 ghante mein aapse sampark karegi.
+              </div>
+            {% elsif form.errors %}
+              <div class="form-alert error">
+                {{ form.errors | default_errors }}
+              </div>
+            {% endif %}
+
+            <div class="form-row">
+              <div class="field">
+                <label for="ContactFormName">Full Name</label>
+                <input type="text" name="contact[name]" id="ContactFormName" placeholder="e.g. Rahul Sharma" required>
+              </div>
+              <div class="field">
+                <label for="ContactFormEmail">Email Address</label>
+                <input type="email" name="contact[email]" id="ContactFormEmail" placeholder="rahul@example.com" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="ContactFormPhone">Phone Number</label>
+                <input type="tel" name="contact[phone]" id="ContactFormPhone" placeholder="+91 00000 00000">
+              </div>
+              <div class="field">
+                <label for="ContactFormSubject">Interested In</label>
+                <select name="contact[subject]" id="ContactFormSubject">
+                  <option value="Living Room">Living Room Furniture</option>
+                  <option value="Bedroom">Bedroom Sets</option>
+                  <option value="Custom Design">Custom Interior Design</option>
+                  <option value="Bulk Order">Commercial/Bulk Order</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="ContactFormMessage">Tell us about your project</label>
+              <textarea rows="5" name="contact[body]" id="ContactFormMessage" placeholder="Aapki requirements yahan likhein..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Send Message</button>
+          {% endform %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Map Section -->
+    <div class="map-wrapper">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.2345!2d77.12345!3d28.5678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDM0JzA0LjEiTiA3N8KwMDcnMjQuNCJF!5e0!3m2!1sen!2sin!4v1625000000000!5m2!1sen!2sin" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Base Styling */
+  .furniture-contact-section {
+    background-color: #fcfcfc;
+    color: #2c2c2c;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .contact-hero {
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    margin-bottom: -60px;
+  }
+
+  .contact-hero h1 { font-size: 3rem; margin-bottom: 10px; letter-spacing: 2px; }
+
+  .contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+    position: relative;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* Sidebar Info */
+  .contact-sidebar {
+    background: #2c2c2c;
+    color: #fff;
+    padding: 60px 40px;
+  }
+
+  .info-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 35px;
+  }
+
+  .info-item .icon { font-size: 24px; }
+  .info-item h3 { color: #c29958; font-size: 18px; margin-bottom: 5px; }
+  .info-item p { font-size: 14px; line-height: 1.6; opacity: 0.9; }
+
+  .social-links { margin-top: 50px; border-top: 1px solid #444; padding-top: 20px; }
+  .social-icons a { color: #c29958; text-decoration: none; font-size: 14px; }
+
+  /* Main Form Area */
+  .contact-main { padding: 60px 40px; }
+  .contact-main h2 { font-size: 28px; margin-bottom: 10px; color: #333; }
+  .contact-main p { color: #777; margin-bottom: 40px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .field { display: flex; flex-direction: column; margin-bottom: 20px; }
+  .field label { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; color: #555; }
+  
+  .field input, .field select, .field textarea {
+    padding: 12px 15px;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: 0.3s;
+  }
+
+  .field input:focus, .field textarea:focus { border-color: #c29958; outline: none; box-shadow: 0 0 5px rgba(194, 153, 88, 0.2); }
+
+  .submit-btn {
+    background: #c29958;
+    color: white;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.4s;
+    width: 100%;
+  }
+
+  .submit-btn:hover { background: #a67f46; transform: translateY(-2px); }
+
+  .form-alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+  .form-alert.success { background: #e7f5ea; color: #2e7d32; border: 1px solid #c3e6cb; }
+
+  .map-wrapper { margin-top: 50px; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+
+  /* Responsive Design */
+  @media (max-width: 900px) {
+    .contact-grid { grid-template-columns: 1fr; }
+    .contact-hero h1 { font-size: 2rem; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Furniture Pro Contact",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Furniture Pro Contact"
+    }
+  ]
+}
+{% endschema %}
