@@ -13,22 +13,10 @@
   "sections": {
     "footer": {
       "type": "footer",
+      "custom_css": [],
       "settings": {
-        "logo": "shopify://shop_images/logo-dark.avif",
-        "logo_max_width": 140,
-        "tagline": "",
-        "social_instagram": "",
-        "social_facebook": "",
-        "social_pinterest": "",
-        "social_x": "",
-        "menu_1_heading": "Shop",
-        "menu_1": "",
-        "menu_2_heading": "Help",
-        "menu_2": "",
-        "show_newsletter": true,
-        "newsletter_heading": "Stay in the loop",
-        "newsletter_subtext": "New arrivals, exclusive offers, and design inspiration.",
-        "show_payment_icons": true
+        "policy_menu": "",
+        "accent_color": "#c49a5e"
       }
     }
   },

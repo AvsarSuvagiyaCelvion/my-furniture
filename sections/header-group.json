@@ -14,12 +14,13 @@
     "header": {
       "type": "header",
       "settings": {
-        "logo": "shopify://shop_images/logo-dark.avif",
+        "logo": "shopify://shop_images/Furniture_logo_design_with_creative_concept__Interior_logo_vector_template-removebg-preview.png",
         "logo_max_width": 160,
         "menu": "main-menu",
         "customer_account_menu": "customer-account-main-menu",
         "show_search": true,
-        "sticky_header": true
+        "sticky_header": true,
+        "accent_color": "#c49a5e"
       }
     }
   },
