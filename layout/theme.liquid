@@ -73,6 +73,42 @@
 
     {% sections 'footer-group' %}
 
+    
+
+    <div style="padding:20px">
+      
+      <input type="number" id="width" placeholder="Width">
+      
+      <input type="number" id="height" placeholder="Height">
+      
+      <button id="calc-btn">
+        Calculate Price
+      </button>
+      
+      <h2 id="result"></h2>
+      
+    </div>
+    
     <script src="{{ 'scroll-animations.js' | asset_url }}" defer></script>
-  </body>
+<script>
+
+document.getElementById("calc-btn").onclick = async () => {
+
+  const width = document.getElementById("width").value
+
+  const height = document.getElementById("height").value
+
+  const response = await fetch(
+    `http://127.0.0.1:8000/calculate?width=${width}&height=${height}`
+  )
+
+  const data = await response.json()
+
+  document.getElementById("result").innerHTML =
+    "Price: ₹" + data.price
+}
+
+</script>
+
+</body>
 </html>
